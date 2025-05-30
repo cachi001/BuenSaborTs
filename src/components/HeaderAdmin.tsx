@@ -9,3 +9,5 @@ export const HeaderAdmin = () => {
         </div>
     )
 }
+
+export default HeaderAdmin
