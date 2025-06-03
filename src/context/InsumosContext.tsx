@@ -10,6 +10,7 @@ interface InsumosContextType {
     agregarInsumo: (nuevo: ArticuloInsumo) => Promise<void>;
     editarInsumo: (id: number, actualizado: ArticuloInsumo) => Promise<void>;
     eliminarInsumo: (id: number) => Promise<void>;
+    fetchUnidadesMedida: () => void
 }
 
 const InsumosContext = createContext<InsumosContextType | undefined>(undefined);
@@ -30,6 +31,7 @@ export const InsumosProvider: React.FC<{ children: React.ReactNode }> = ({ child
         agregarInsumo,
         editarInsumo,
         eliminarInsumo,
+        fetchUnidadesMedida
     } = useInsumosApi();
 
     return (
@@ -41,6 +43,7 @@ export const InsumosProvider: React.FC<{ children: React.ReactNode }> = ({ child
                 agregarInsumo,
                 editarInsumo,
                 eliminarInsumo,
+                fetchUnidadesMedida
             }}
         >
             {children}

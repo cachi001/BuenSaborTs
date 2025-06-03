@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import HeaderAdmin from '../components/HeaderAdmin'
 import SideBar from '../components/SideBar'
 import { Boton } from '../components/Boton'
@@ -23,7 +23,7 @@ export interface InsumoDto {
 }
 
 export const Insumos = () => {
-  const { insumos, agregarInsumo, editarInsumo, eliminarInsumo, unidadesMedida } = useInsumos()
+  const { insumos, agregarInsumo, editarInsumo, eliminarInsumo, unidadesMedida, fetchUnidadesMedida } = useInsumos()
   const { categorias } = useCategoria();
 
   const [isModalOpen, setIsModalOpen] = useState(false)
@@ -40,8 +40,8 @@ export const Insumos = () => {
   const [unidadMedida, setUnidadMedida] = useState<UnidadMedida | null>(null)
   const [categoria, setCategoria] = useState<Categoria | null>(null)
 
-  console.log(insumos)
-  console.log(unidadMedida)
+  console.log("INSUMOS: ", insumos)
+  console.log("UNIDAD MEDIDA INSUMO ", unidadMedida)
   // Cuando abro el modal para crear
   const handleAbrirModal = () => {
     setModoEdicion(false)
@@ -98,6 +98,10 @@ export const Insumos = () => {
     handleCerrarModal()
   }
 
+  useEffect(() => {
+    fetchUnidadesMedida()
+  }, [])
+
   return (
     <div className="min-h-screen flex flex-col">
       <HeaderAdmin />
@@ -114,19 +118,19 @@ export const Insumos = () => {
             />
           </div>
 
-          <div className="overflow-x-auto mt-6 rounded-lg shadow">
-            <table className="min-w-full bg-white text-sm text-gray-700">
-              <thead className="bg-gray-200 text-gray-700 font-semibold">
+          <div className="w-320 overflow-x-auto mt-6 rounded-lg shadow scrollbar-thin">
+            <table className="w-full bg-white text-center text-gray-700">
+              <thead className="bg-gray-200 text-gray-700 font-semibold text-sm">
                 <tr>
-                  <th className="px-4 py-3 text-left">Denominación</th>
-                  <th className="px-4 py-3 text-left">Precio Compra</th>
-                  <th className="px-4 py-3 text-left">Precio Venta</th>
-                  <th className="px-4 py-3 text-left">Stock Actual</th>
-                  <th className="px-4 py-3 text-left">Stock Máximo</th>
-                  <th className="px-4 py-3 text-left">Para Elaborar</th>
-                  <th className="px-4 py-3 text-left">Unidad de Medida</th>
-                  <th className="px-4 py-3 text-left">Categoría</th>
-                  <th className="px-4 py-3 text-left">Acciones</th>
+                  <th className="px-4 py-3 whitespace-nowrap">Precio Compra</th>
+                  <th className="px-4 py-3 whitespace-nowrap">Precio Venta</th>
+                  <th className="px-4 py-3 whitespace-nowrap">Denominación</th>
+                  <th className="px-4 py-3 whitespace-nowrap">Stock Actual</th>
+                  <th className="px-4 py-3 whitespace-nowrap">Stock Máximo</th>
+                  <th className="px-4 py-3 whitespace-nowrap">Para Elaborar</th>
+                  <th className="px-4 py-3 whitespace-nowrap">Unidad de Medida</th>
+                  <th className="px-4 py-3 whitespace-nowrap">Categoría</th>
+                  <th className="px-4 py-3 whitespace-nowrap">Acciones</th>
                 </tr>
               </thead>
               <tbody>
@@ -145,17 +149,17 @@ export const Insumos = () => {
                         title={insumo.esParaElaborar ? 'Para elaborar' : 'No para elaborar'}
                       ></span>
                     </td>
-                    <td className="px-4 py-2">{insumo.unidadMedida?.denominacion || "-"}</td>
-                    <td className="px-4 py-2">{insumo.categoria?.denominacion || "-"}</td>
-                    <td className="px-4 py-2 flex gap-2">
+                    <td className="px-6 py-2">{insumo.unidadMedida?.denominacion || "-"}</td>
+                    <td className="px-6 py-2">{insumo.categoria?.denominacion || "-"}</td>
+                    <td className="px-6 py-2 flex gap-4">
                       <button
-                        className="cursor-pointer bg-blue-500 hover:bg-blue-600 text-white px-3 py-2 rounded"
+                        className="cursor-pointer rounded-md px-6 py-2 text-white bg-blue-500 hover:bg-blue-300"
                         onClick={() => handleEditar(insumo)}
                       >
                         Editar
                       </button>
                       <button
-                        className="cursor-pointer bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded"
+                        className="cursor-pointer bg-red-500 hover:bg-red-600 text-white px-6 py-2 rounded-md"
                         onClick={() => eliminarInsumo(insumo.id!)}
                       >
                         Eliminar

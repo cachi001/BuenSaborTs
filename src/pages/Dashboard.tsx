@@ -1,8 +1,7 @@
-import React from 'react'
 import { HeaderAdmin } from '../components/HeaderAdmin'
 import { SideBar } from '../components/SideBar'
 
-export const Admin = () => {
+export const Dashboard = () => {
     return (
         <div>
             <HeaderAdmin></HeaderAdmin>

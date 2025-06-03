@@ -1,5 +1,5 @@
 import type { FormEvent} from 'react'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { UnidadMedida } from '../classes/UnidadMedidaClass'
 import type { Categoria } from '../classes/CategoriaClass'
 import type { InsumoDto } from '../pages/Insumo'
@@ -47,7 +47,6 @@ interface Props {
 
 export const FormularioInsumo = ({
     modoEdicion,
-    setModoEdicion,
     denominacion,
     setDenominacion,
     precioCompra,
@@ -71,6 +70,7 @@ export const FormularioInsumo = ({
 }: Props) => {
     const [modalUnidadAbierto, setModalUnidadAbierto] = useState(false)
     const [denominacionOriginal, setDenominacionOriginal] = useState<string | null>(null);
+    const [modoEdicionUnidad, setModoEdicionUnidad] = useState<boolean> (false)
 
     const [unidadesMedidasTemp, setUnidadesMedidasTemp] = useState<UnidadMedida[]>([])
     const listaUnidades = [...unidadesMedida, ...unidadesMedidasTemp];
@@ -80,6 +80,7 @@ export const FormularioInsumo = ({
     const [subcategorias, setSubcategorias] = useState<Categoria[]>([]);
     const [historialCategorias, setHistorialCategorias] = useState<Categoria[]>([]);
 
+    console.log("UNIDADES DE MEDIDA FORM", unidadesMedida)
     const handleSubmit = (e: FormEvent) => {
         e.preventDefault()
 
@@ -125,7 +126,7 @@ export const FormularioInsumo = ({
         setUnidadMedida(nuevaUnidad);
 
         setUnidadesMedidasTemp(prev => {
-            if (modoEdicion && denominacionOriginal) {
+            if (modoEdicionUnidad && denominacionOriginal) {
                 return prev.map(r =>
                     r.denominacion.trim().toLowerCase() === denominacionOriginal.trim().toLowerCase()
                         ? nuevaUnidad
@@ -142,19 +143,20 @@ export const FormularioInsumo = ({
             }
         });
 
-        setModoEdicion(true);
+        setModoEdicionUnidad(true);
         setModalUnidadAbierto(false);
     };
 
     const abrirModalUnidad = (unidad?: UnidadMedida) => {
+        console.log("ABRIENDO MODAL "+ unidad?.denominacion)
         if (unidad) {
             setUnidadMedida(unidad);
             setDenominacionOriginal(unidad.denominacion);
-            setModoEdicion(true);
+            setModoEdicionUnidad(true);
         } else {
             setUnidadMedida(null);
             setDenominacionOriginal(null);
-            setModoEdicion(false);
+            setModoEdicionUnidad(false);
         }
         setModalUnidadAbierto(true);
     }
@@ -175,6 +177,19 @@ export const FormularioInsumo = ({
             setSubcategorias([]);
         }
     };
+
+    useEffect(() => {
+    const cargarEnEdicion = async () => {
+        if (modoEdicion && categoria) {
+            setCategoriaActual(categoria);
+            setHistorialCategorias([categoria]);
+            const hijas = await cargarSubcategorias(categoria.id!);
+            setSubcategorias(hijas);
+        }
+    };
+
+    cargarEnEdicion();
+}, [modoEdicion, categoria]);
 
     return (
         <div>
@@ -243,20 +258,20 @@ export const FormularioInsumo = ({
                         >
                         <option value="" disabled>Seleccione una unidad</option>
                         {listaUnidades.map((unidad) => (
-                        <option key={unidad.id} value={unidad.denominacion}>
+                        <option key={unidad.denominacion} value={unidad.denominacion}>
                             {unidad.denominacion}
                         </option>
                         ))}
 
                     </select>
 
-                    {!modoEdicion && (
+                    {!modoEdicion && !unidadMedida?.id && (
                     <button
                         type="button"
                         onClick={() => abrirModalUnidad(unidadMedida || undefined)}
                         className="cursor-pointer mt-2 px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 text-sm"
                     >
-                        {unidadMedida ? 'Editar' : '+ Añadir'}
+                        {modoEdicionUnidad ? 'Editar' : '+ Añadir'}
                     </button>
                     )}
 
@@ -324,12 +339,12 @@ export const FormularioInsumo = ({
             </form>
             {modalUnidadAbierto && (
                 <Modal isOpen={modalUnidadAbierto} onClose={() => setModalUnidadAbierto(false)}
-                titulo={modoEdicion ? "Editar Unidad Medida" : "Nueva Unidad Medida" }>
+                titulo={modoEdicionUnidad ? "Editar Unidad Medida" : "Nueva Unidad Medida" }>
                 <FormularioUnidadMedida
                     onClose={() => setModalUnidadAbierto(false)}
                     onGuardar={handleGuardarUnidad}
                     unidadEnEdicion={unidadMedida}
-                    modoEdicion = {modoEdicion}
+                    modoEdicion = {modoEdicionUnidad}
                 />
                 
             </Modal>)

@@ -8,6 +8,9 @@ export const SideBar: React.FC = () => {
                 <h2 className='text-lg px-2 font-bold border-b border-gray-700 pb-2'>Secciones</h2>
             </div>
             <nav className='flex flex-col space-y-4'>
+                <Link to="/dashboard" className='hover:text-yellow-300 text-lg hover:bg-yellow-900 px-2 py-1 rounded'>
+                    Dashboard
+                </Link>
                 <Link to="/categorias" className='hover:text-yellow-300 text-lg hover:bg-yellow-900 px-2 py-1 rounded'>
                     Categorías
                 </Link>
@@ -15,11 +18,8 @@ export const SideBar: React.FC = () => {
                 px-2 py-1 rounded'>
                     Insumos
                 </Link>
-                <Link to="/productos" className='hover:text-yellow-300 text-lg hover:bg-yellow-900 px-2 py-1 rounded'>
-                    Productos
-                </Link>
-                <Link to="/semielaborados" className='hover:text-yellow-300 text-lg hover:bg-yellow-900 px-2 py-1 rounded'>
-                    Semielaborados
+                <Link to="/manufacturados" className='hover:text-yellow-300 text-lg hover:bg-yellow-900 px-2 py-1 rounded'>
+                    Manufacturados
                 </Link>
             </nav>
         </div>

@@ -26,5 +26,17 @@
     -webkit-appearance: none;
     margin: 0;
     }
-
+    .scrollbar-thin::-webkit-scrollbar {
+    height: 2px;
+    }
+    .scrollbar-thin::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+    
+    }
+    .scrollbar-thin::-webkit-scrollbar-thumb {
+    background-color: rgb(0, 0, 0);
+    border-radius: 10px;
+    cursor: pointer;
+    }
 }

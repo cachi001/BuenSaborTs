@@ -1,13 +1,18 @@
-import { ArticuloInsumo } from "./ArticuloInsumoClass";
+import type { UnidadMedida } from "./UnidadMedidaClass";
 
+export interface ArticuloInsumoDto {
+    id?: number,
+    denominacion: string,
+    unidadMedida: UnidadMedida
+}
 export class ArticuloManufacturadoDetalle {
     id?: number;
     cantidad: number;
-    articuloInsumo: ArticuloInsumo;
+    articuloInsumo: ArticuloInsumoDto;
 
-    constructor(id: number, cantidad: number, articuloInsumo: ArticuloInsumo) {
-        this.id = id;
+    constructor(cantidad: number, articuloInsumo: ArticuloInsumoDto, id?: number,) {
         this.cantidad = cantidad;
         this.articuloInsumo = articuloInsumo;
+        this.id = id;
     }
 }
