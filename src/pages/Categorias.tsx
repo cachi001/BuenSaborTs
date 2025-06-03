@@ -1,136 +1,163 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import HeaderAdmin from '../components/HeaderAdmin'
 import SideBar from '../components/SideBar'
 import { Boton } from '../components/Boton'
 import { Modal } from '../components/Modal'
-import { useCategoria } from '../context/CategoriaContext' // ajusta la ruta
+import { useCategoria } from '../context/CategoriaContext'
+import type { Categoria } from '../classes/CategoriaClass'
+import { FormularioCategorias } from '../components/FormularioCategoria'
 
-    type Categoria = {
-    id: number
-    denominacion: string
-    categoriaPadre?: {
-        denominacion: string
-    }
-    }
+export interface CategoriaDto {
+    id?: number;
+    denominacion: string;
+    categoriaPadreId: number | null;
+}
 
-    export const Categorias = () => {
-    const { categorias, agregarCategoria } = useCategoria()
+export interface CategoriaPadreDto {
+    id?: number;
+    denominacion: string;
+}
+
+export const Categorias = () => {
+    const {
+        categorias,
+        eliminarCategoria,
+    } = useCategoria()
 
     const [isModalOpen, setIsModalOpen] = useState(false)
-    const [denominacion, setDenominacion] = useState('')
-    const [categoriaPadreId, setCategoriaPadreId] = useState<number | null>(null)
+    const [modalEliminarAbierto, setModalEliminarAbierto] = useState(false)
+    const [categoriaAEliminar, setCategoriaAEliminar] = useState<Categoria | null>(null)
+    const [modoEdicion, setModoEdicion] = useState(false)
+    const [categoriaEnEdicion, setCategoriaEnEdicion] = useState<Categoria | null>(null)
 
-    const handleAbrirModal = () => setIsModalOpen(true)
+    const handleAbrirModal = () => {
+        setModoEdicion(false)
+        setCategoriaEnEdicion(null)
+        setIsModalOpen(true)
+    }
+
+    const handleEditar = (categoria: Categoria)  => {
+        setModoEdicion(true)
+        setCategoriaEnEdicion(categoria)
+        setIsModalOpen(true)
+    }
+
+    const handleEliminar = (categoria: Categoria) => {
+        setCategoriaAEliminar(categoria)
+        setModalEliminarAbierto(true)
+    }
+
+    const confirmarEliminar = () => {
+        if (categoriaAEliminar?.id !== undefined) {
+            eliminarCategoria(categoriaAEliminar.id)
+        }
+        setCategoriaAEliminar(null)
+        setModalEliminarAbierto(false)
+    }
+
+    const cancelarEliminar = () => {
+        setCategoriaAEliminar(null)
+        setModalEliminarAbierto(false)
+    }
+
     const handleCerrarModal = () => {
         setIsModalOpen(false)
-        setDenominacion('')
-        setCategoriaPadreId(null)
+        setModoEdicion(false)
+        setCategoriaEnEdicion(null)
     }
 
-    const handleGuardar = (e: React.FormEvent) => {
-        e.preventDefault()
-        if (!denominacion.trim()) return alert('El nombre de la categoría es obligatorio.')
-
-        const categoriaPadre = categorias.find(cat => cat.id === categoriaPadreId) || undefined
-
-        const nuevaCategoria: Categoria = {
-        id: categorias.length + 1,
-        denominacion: denominacion.trim(),
-        categoriaPadre: categoriaPadre ? { denominacion: categoriaPadre.denominacion } : undefined,
-        }
-
-        agregarCategoria(nuevaCategoria)
-        handleCerrarModal()
-    }
 
     return (
         <div className="min-h-screen flex flex-col">
-        <HeaderAdmin />
+            <HeaderAdmin />
 
-        <div className="flex flex-1">
-            <SideBar />
+            <div className="flex flex-1 overflow-auto">
+                <SideBar />
 
-            <main className="flex-1 py-10 px-10 pb-10 bg-gray-100">
-            <div className="flex justify-between items-center pb-4">
-                <h1 className="text-2xl font-semibold">Categorías</h1>
-                <Boton
-                estiloBoton="border rounded-md py-2 px-8 font-semibold text-sm bg-yellow-400 text-white hover:bg-yellow-500 transition"
-                textoBoton="Añadir"
-                onClick={handleAbrirModal}
+                <main className="flex-1 py-10 px-10 pb-10 bg-gray-100">
+                    <div className="flex justify-between items-center pb-4">
+                        <h1 className="text-2xl font-semibold">Categorías</h1>
+                        <Boton
+                            estiloBoton="border rounded-md py-2 px-8 font-semibold text-sm bg-yellow-400 text-white hover:bg-yellow-500 transition"
+                            textoBoton="Añadir"
+                            onClick={handleAbrirModal}
+                        />
+                    </div>
+
+                    <div className="overflow-x-auto max-h-120 rounded-lg shadow bg-white overflow-y-auto">
+                        <table className="min-w-full text-sm text-center">
+                            <thead className="bg-gray-200 text-gray-700">
+                                <tr>
+                                    <th className="px-6 py-3">Denominación</th>
+                                    <th className="px-6 py-3">Categoría Padre</th>
+                                    <th className="px-6 py-3">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody className="text-gray-800">
+                                {categorias.map((cat) => (
+                                    <tr key={cat.id} className="border-b hover:bg-gray-50">
+                                        <td className="px-6 py-4 font-medium">{cat.denominacion}</td>
+                                        <td className="px-6 py-4">{cat.categoriaPadre?.denominacion ?? '—'}</td>
+                                        <td className="px-6 py-4">
+                                            <div className="flex items-center justify-center gap-4">
+                                                <button
+                                                    className="cursor-pointer rounded-md px-6 py-2 text-white bg-blue-500 hover:bg-blue-300"
+                                                    onClick={() => handleEditar(cat)}
+                                                >
+                                                    Editar
+                                                </button>
+                                                <button
+                                                    className="cursor-pointer rounded-md px-6 py-2 text-white bg-red-500 hover:bg-red-300"
+                                                    onClick={() => handleEliminar(cat)}
+                                                >
+                                                    Eliminar
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                </main>
+            </div>
+            <Modal
+                isOpen={modalEliminarAbierto}
+                onClose={cancelarEliminar}
+                titulo="Confirmar Eliminación"
+            >
+                <div className="text-center">
+                    <p className="mb-4">
+                        ¿Estás seguro de que querés eliminar la categoría{' '}
+                        <strong>{categoriaAEliminar?.denominacion}</strong>?
+                    </p>
+                    <div className="flex justify-center gap-4">
+                        <button
+                            className="cursor-pointer bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded"
+                            onClick={cancelarEliminar}
+                        >
+                            Cancelar
+                        </button>
+                        <button
+                            className="cursor-pointer bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded"
+                            onClick={confirmarEliminar}
+                        >
+                            Eliminar
+                        </button>
+                    </div>
+                </div>
+            </Modal>
+            <Modal
+                isOpen={isModalOpen}
+                onClose={handleCerrarModal}
+                titulo={modoEdicion ? 'Editar Categoría' : 'Nueva Categoría'}
+                >
+                <FormularioCategorias
+                    onClose={handleCerrarModal}
+                    modoEdicion={modoEdicion}
+                    categoriaEnEdicion={categoriaEnEdicion}
                 />
-            </div>
-
-            <div className="overflow-x-auto rounded-lg shadow bg-white">
-                <table className="min-w-full text-sm text-left">
-                <thead className="bg-gray-200 text-gray-700">
-                    <tr>
-                    <th className="px-6 py-3">ID</th>
-                    <th className="px-6 py-3">Denominación</th>
-                    <th className="px-6 py-3">Categoría Padre</th>
-                    </tr>
-                </thead>
-                <tbody className="text-gray-800">
-                    {categorias.map((cat) => (
-                    <tr key={cat.id} className="border-b hover:bg-gray-50">
-                        <td className="px-6 py-4">{cat.id}</td>
-                        <td className="px-6 py-4 font-medium">{cat.denominacion}</td>
-                        <td className="px-6 py-4">{cat.categoriaPadre ? cat.categoriaPadre.denominacion : '—'}</td>
-                    </tr>
-                    ))}
-                </tbody>
-                </table>
-            </div>
-            </main>
-        </div>
-
-        {/* Modal visible si isModalOpen es true */}
-        <Modal isOpen={isModalOpen} onClose={handleCerrarModal} titulo="Nueva Categoría">
-            <form className="space-y-4" onSubmit={handleGuardar}>
-            <div className="flex flex-col gap-2">
-                <label className="block text-sm font-medium text-gray-700">Nombre de la categoría</label>
-                <input
-                type="text"
-                className="border-1 border-gray-200 py-2 block w-full border-gray-400 rounded-md shadow-sm px-2"
-                placeholder="Ej: Bebidas"
-                value={denominacion}
-                onChange={(e) => setDenominacion(e.target.value)}
-                autoFocus
-                />
-            </div>
-
-            <div className="flex flex-col gap-2">
-                <label className="block text-sm font-medium text-gray-700">Categoría Padre (opcional)</label>
-                <select
-                className="border-1 border-gray-200 py-2 block w-full border-gray-400 rounded-md shadow-sm px-2"
-                value={categoriaPadreId ?? ''}
-                onChange={(e) => setCategoriaPadreId(e.target.value ? Number(e.target.value) : null)}
-                >
-                <option value="">Ninguna</option>
-                {categorias.map((cat) => (
-                    <option key={cat.id} value={cat.id}>
-                    {cat.denominacion}
-                    </option>
-                ))}
-                </select>
-            </div>
-
-            <div className="flex justify-end">
-                <button
-                type="button"
-                className="cursor-pointer bg-gray-300 text-gray-700 px-4 py-2 rounded hover:bg-gray-400 mr-2"
-                onClick={handleCerrarModal}
-                >
-                Cancelar
-                </button>
-                <button
-                type="submit"
-                className="cursor-pointer bg-green-400 text-white px-4 py-2 rounded hover:bg-green-600"
-                >
-                Guardar
-                </button>
-            </div>
-            </form>
-        </Modal>
+            </Modal>
         </div>
     )
-    }
+}

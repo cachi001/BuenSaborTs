@@ -1,5 +1,5 @@
 import { Categoria } from "./CategoriaClass";
-import { UnidadMedida } from "./UnidadMedidadClass";
+import { UnidadMedida } from "./UnidadMedidaClass";
 
 export class ArticuloInsumo {
     id?: number;
@@ -13,7 +13,6 @@ export class ArticuloInsumo {
     categoria: Categoria;
 
     constructor(
-        id: number,
         denominacion: string,
         precioVenta: number,
         precioCompra: number,
@@ -21,7 +20,8 @@ export class ArticuloInsumo {
         stockMaximo: number,
         esParaElaborar: boolean,
         unidadMedida: UnidadMedida,
-        categoria: Categoria
+        categoria: Categoria,
+        id?: number
     ) {
         this.id = id;
         this.denominacion = denominacion;

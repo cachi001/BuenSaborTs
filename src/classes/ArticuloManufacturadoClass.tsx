@@ -1,5 +1,5 @@
 import { Categoria } from "./CategoriaClass";
-import { UnidadMedida } from "./UnidadMedidadClass";
+import { UnidadMedida } from "./UnidadMedidaClass";
 import { ArticuloManufacturadoDetalle } from "./ArticuloManufacturadoDetalleClass";
 
 export class ArticuloManufacturado {
