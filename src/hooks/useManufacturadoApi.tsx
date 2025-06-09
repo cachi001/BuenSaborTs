@@ -6,7 +6,7 @@ export function useManufacturadoApi() {
 
     const fetchManufacturados = async () => {
         try {
-            const res = await fetch("http://localhost:8080/articulo-manufacturado");
+            const res = await fetch("http://localhost:8080/articulo-manufacturado/all");
             const data = await res.json();
             const instancias = data.map((item: any) =>
                 new ArticuloManufacturado(
@@ -29,7 +29,7 @@ export function useManufacturadoApi() {
 
     const agregarManufacturado = async (nuevo: ArticuloManufacturado) => {
         try {
-            const res = await fetch("http://localhost:8080/articulo-manufacturado", {
+            const res = await fetch("http://localhost:8080/articulo-manufacturado/new", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(nuevo),
@@ -55,7 +55,7 @@ export function useManufacturadoApi() {
 
     const actualizarManufacturado = async (id: number, actualizado: ArticuloManufacturado) => {
         try {
-            const res = await fetch(`http://localhost:8080/articulo-manufacturado/${id}`, {
+            const res = await fetch(`http://localhost:8080/articulo-manufacturado/actualizar/${id}`, {
                 method: "PUT",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(actualizado),
@@ -72,7 +72,7 @@ export function useManufacturadoApi() {
 
     const eliminarManufacturado = async (id: number) => {
         try {
-            const res = await fetch(`http://localhost:8080/articulo-manufacturado/${id}`, {
+            const res = await fetch(`http://localhost:8080/articulo-manufacturado/eliminar/${id}`, {
                 method: "DELETE",
             });
             if (!res.ok) throw new Error("Error al eliminar manufacturado");

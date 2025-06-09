@@ -2,33 +2,30 @@ import { useState, useEffect } from "react";
 import { ArticuloInsumo } from "../classes/ArticuloInsumoClass";
 import { UnidadMedida } from "../classes/UnidadMedidaClass";
 import { Categoria } from "../classes/CategoriaClass";
-import type { InsumoRecord } from "../components/FormularioInsumo";
-import type { InsumoDto } from "../pages/Insumo";
+import type { InsumoRequest } from "../components/FormularioInsumo";
+import type { ArticuloInsumoBase } from "../classes/ArticuloManufacturadoDetalleClass";
 
 export function useInsumosApi() {
     const [insumos, setInsumos] = useState<ArticuloInsumo[]>([]);
+    const [insumosBase, setInsumosBase] = useState<ArticuloInsumoBase[]>([]);
     const [unidadesMedida, setUnidadesMedida] = useState<UnidadMedida[]>([]);
 
     const fetchInsumos = async () => {
         try {
         const res = await fetch("http://localhost:8080/articulo-insumo/all");
         if (!res.ok) throw new Error("Error al obtener insumos");
-        const data = await res.json();
-        const instancias = data.map(
-            (item: any) =>
-            new ArticuloInsumo(
-                item.denominacion,
-                item.precioVenta,
-                item.precioCompra,
-                item.stockActual,
-                item.stockMaximo,
-                item.esParaElaborar,
-                item.unidadMedida,
-                item.categoria,
-                item.id
-            )
-        );
-        setInsumos(instancias);
+        const data: ArticuloInsumo[] = await res.json();
+        setInsumos(data);
+        } catch (error) {
+        console.error("Error al obtener insumos:", error);
+        }
+    };
+    const fetchInsumosBase = async () => {
+        try {
+        const res = await fetch("http://localhost:8080/articulo-insumo/base/all");
+        if (!res.ok) throw new Error("Error al obtener insumos base");
+        const data: ArticuloInsumoBase[] = await res.json();
+        setInsumosBase(data);
         } catch (error) {
         console.error("Error al obtener insumos:", error);
         }
@@ -39,24 +36,17 @@ export function useInsumosApi() {
         try {
         const res = await fetch("http://localhost:8080/unidad-medida/all");
         if (!res.ok) throw new Error("Error al obtener unidades de medida");
-        const data = await res.json();
-        const instancias = data.map(
-            (item: any) =>
-            new UnidadMedida(
-                item.denominacion,
-                item.id,
-            )
-        );
-        console.log("Unidades obtenidas:", instancias);
-        setUnidadesMedida(instancias);
+        const data: UnidadMedida[] = await res.json();
+        console.log("Unidades obtenidas:", data);
+        setUnidadesMedida(data);
         } catch (error) {
         console.error("Error al obtener unidades de medida:", error);
         }
     };
 
-    const agregarInsumo = async (nuevo: InsumoDto) => {
+    const agregarInsumo = async (nuevo: ArticuloInsumo) => {
 
-        const insumoNew: InsumoRecord = {
+        const insumoNew: InsumoRequest = {
             denominacion: nuevo.denominacion,
             precioVenta: Number(nuevo.precioVenta),
             precioCompra: Number(nuevo.precioCompra),
@@ -137,8 +127,10 @@ export function useInsumosApi() {
 
     return {
         insumos,
+        insumosBase,
         unidadesMedida,
         fetchInsumos,
+        fetchInsumosBase,
         fetchUnidadesMedida,
         agregarInsumo,
         editarInsumo,

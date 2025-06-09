@@ -7,7 +7,7 @@ import { useCategoria } from '../context/CategoriaContext'
 import type { Categoria } from '../classes/CategoriaClass'
 import { FormularioCategorias } from '../components/FormularioCategoria'
 
-export interface CategoriaDto {
+export interface CategoriaRequest {
     id?: number;
     denominacion: string;
     categoriaPadreId: number | null;
@@ -76,7 +76,7 @@ export const Categorias = () => {
 
                 <main className="flex-1 py-10 px-10 pb-10 bg-gray-100">
                     <div className="flex justify-between items-center pb-4">
-                        <h1 className="text-2xl font-semibold">Categorías</h1>
+                        <h2 className="text-2xl font-semibold">Categorías</h2>
                         <Boton
                             estiloBoton="border rounded-md py-2 px-8 font-semibold text-sm bg-yellow-400 text-white hover:bg-yellow-500 transition"
                             textoBoton="Añadir"

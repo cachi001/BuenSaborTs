@@ -10,24 +10,14 @@ import type { UnidadMedida } from '../classes/UnidadMedidaClass'
 import { useInsumos } from '../context/InsumosContext'
 import { useCategoria } from '../context/CategoriaContext'
 
-export interface InsumoDto {
-  id?: number
-  denominacion: string
-  precioVenta: number
-  precioCompra: number
-  stockActual: number
-  stockMaximo: number
-  esParaElaborar: boolean
-  unidadMedida: UnidadMedida
-  categoria: Categoria
-}
-
 export const Insumos = () => {
   const { insumos, agregarInsumo, editarInsumo, eliminarInsumo, unidadesMedida, fetchUnidadesMedida } = useInsumos()
   const { categorias } = useCategoria();
 
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [modoEdicion, setModoEdicion] = useState(false)
+
+  //Insumo en Edicion
   const [insumoEnEdicion, setInsumoEnEdicion] = useState<ArticuloInsumo | null>(null)
 
   // Estados controlados para el formulario
@@ -42,6 +32,7 @@ export const Insumos = () => {
 
   console.log("INSUMOS: ", insumos)
   console.log("UNIDAD MEDIDA INSUMO ", unidadMedida)
+
   // Cuando abro el modal para crear
   const handleAbrirModal = () => {
     setModoEdicion(false)
@@ -88,7 +79,7 @@ export const Insumos = () => {
     setInsumoEnEdicion(null)
   }
 
-  const handleGuardar = (insumoDto: InsumoDto) => {
+  const handleGuardar = (insumoDto: ArticuloInsumo) => {
 
     if (modoEdicion && insumoEnEdicion?.id !== undefined) {
       editarInsumo(insumoEnEdicion.id, insumoDto)
@@ -110,7 +101,7 @@ export const Insumos = () => {
 
         <main className="flex-1 py-10 px-10 pb-10 bg-gray-100">
           <div className="flex justify-between items-center pb-4">
-            <h1 className="text-2xl font-semibold">Insumos</h1>
+            <h2 className="text-2xl font-semibold">Insumos</h2>
             <Boton
               estiloBoton="border rounded-md py-2 px-8 font-semibold text-sm bg-yellow-400 text-white hover:bg-yellow-500 transition"
               textoBoton="Añadir"
@@ -122,9 +113,9 @@ export const Insumos = () => {
             <table className="w-full bg-white text-center text-gray-700">
               <thead className="bg-gray-200 text-gray-700 font-semibold text-sm">
                 <tr>
+                  <th className="px-4 py-3 whitespace-nowrap">Denominación</th>
                   <th className="px-4 py-3 whitespace-nowrap">Precio Compra</th>
                   <th className="px-4 py-3 whitespace-nowrap">Precio Venta</th>
-                  <th className="px-4 py-3 whitespace-nowrap">Denominación</th>
                   <th className="px-4 py-3 whitespace-nowrap">Stock Actual</th>
                   <th className="px-4 py-3 whitespace-nowrap">Stock Máximo</th>
                   <th className="px-4 py-3 whitespace-nowrap">Para Elaborar</th>
@@ -176,7 +167,7 @@ export const Insumos = () => {
           isOpen={isModalOpen} 
           onClose={handleCerrarModal} 
           titulo={modoEdicion ? "Editar Insumo" : "Nuevo Insumo" } 
-          className="bg-white rounded-2xl p-6 max-w-4xl w-full shadow-lg">
+          className="bg-white rounded-2xl p-4 max-w-4xl w-full shadow-lg">
             <FormularioInsumo
               modoEdicion={modoEdicion}
               setModoEdicion={setModoEdicion}

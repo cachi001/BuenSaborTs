@@ -1,9 +1,8 @@
-import React from 'react';
 import { Link } from 'react-router-dom';
 
-export const SideBar: React.FC = () => {
+export const SideBar = () => {
     return (
-        <div className='h-screen flex flex-col justify-start bg-black w-60 text-white p-4'>
+        <div className='h-screen flex flex-col justify-start bg-black min-w-60 text-white p-4'>
             <div className='pb-6 text-start'>
                 <h2 className='text-lg px-2 font-bold border-b border-gray-700 pb-2'>Secciones</h2>
             </div>

@@ -10,29 +10,17 @@ import type { UnidadMedida } from '../classes/UnidadMedidaClass'
 import { useManufacturados } from '../context/ManufacturadosContext'
 import { useCategoria } from '../context/CategoriaContext'
 import { useInsumos } from '../context/InsumosContext'
-import type { ArticuloManufacturadoDetalle } from '../classes/ArticuloManufacturadoDetalleClass'
-
-export interface ManufacturadoDto {
-  id?: number
-  denominacion: string
-  precioVenta: number
-  descripcion: string
-  tiempoEstimado: number
-  preparacion: string
-  unidadMedida: UnidadMedida
-  categoria: Categoria
-  articuloManufacturadoDetalles: ArticuloManufacturadoDetalle[]
-}
 
 export const Manufacturados = () => {
   const { manufacturados, agregarManufacturado, actualizarManufacturado, eliminarManufacturado} = useManufacturados()
-  const { fetchUnidadesMedida, unidadesMedida, insumos } = useInsumos()
+  const { fetchUnidadesMedida, unidadesMedida, fetchInsumosBase, insumosBase } = useInsumos()
   const { categorias } = useCategoria()
 
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [modoEdicion, setModoEdicion] = useState(false)
   const [manufacturadoEnEdicion, setManufacturadoEnEdicion] = useState<ArticuloManufacturado | null>(null)
 
+  //Estados para el formulario
   const [denominacion, setDenominacion] = useState('')
   const [precioVenta, setPrecioVenta] = useState<number | ''>('')
   const [descripcion, setDescripcion] = useState('')
@@ -61,7 +49,6 @@ export const Manufacturados = () => {
   }
 
   const handleEditar = (manufacturado: ArticuloManufacturado) => {
-    setModoEdicion(true)
     setManufacturadoEnEdicion(manufacturado)
     setDenominacion(manufacturado.denominacion)
     setPrecioVenta(manufacturado.precioVenta)
@@ -71,26 +58,28 @@ export const Manufacturados = () => {
     setUnidadMedida(manufacturado.unidadMedida)
     setCategoria(manufacturado.categoria)
     setDetalles(manufacturado.articuloManufacturadoDetalles)
+    setModoEdicion(true)
     setIsModalOpen(true)
   }
 
   const handleCerrarModal = () => {
-    setIsModalOpen(false)
     limpiarCampos()
+    setIsModalOpen(false)
     setModoEdicion(false)
     setManufacturadoEnEdicion(null)
   }
 
-  const handleGuardar = (dto: ManufacturadoDto) => {
+  const handleGuardar = (manufacturadoDto: ArticuloManufacturado) => {
     if (modoEdicion && manufacturadoEnEdicion?.id !== undefined) {
-      actualizarManufacturado(manufacturadoEnEdicion.id, dto)
+      actualizarManufacturado(manufacturadoEnEdicion.id, manufacturadoDto)
     } else {
-      agregarManufacturado(dto)
+      agregarManufacturado(manufacturadoDto)
     }
     handleCerrarModal()
   }
 
   useEffect(() => {
+    fetchInsumosBase()
     fetchUnidadesMedida()
   }, [])
 
@@ -101,7 +90,7 @@ export const Manufacturados = () => {
         <SideBar />
         <main className="flex-1 py-10 px-10 bg-gray-100">
           <div className="flex justify-between items-center pb-4">
-            <h1 className="text-2xl font-semibold">Manufacturados</h1>
+            <h2 className="text-2xl font-semibold">Manufacturados</h2>
             <Boton
               estiloBoton="border rounded-md py-2 px-8 font-semibold text-sm bg-yellow-400 text-white hover:bg-yellow-500 transition"
               textoBoton="Añadir"
@@ -153,7 +142,7 @@ export const Manufacturados = () => {
             isOpen={isModalOpen}
             onClose={handleCerrarModal}
             titulo={modoEdicion ? 'Editar Manufacturado' : 'Nuevo Manufacturado'}
-            className="bg-white rounded-2xl p-6 max-w-4xl w-full shadow-lg"
+            className="bg-white rounded-2xl p-6 max-w-7xl w-full shadow-lg"
           >
             <FormularioManufacturado
               modoEdicion={modoEdicion}
@@ -176,7 +165,7 @@ export const Manufacturados = () => {
               setDetalles={setDetalles}
               categorias={categorias}
               unidadesMedida={unidadesMedida}
-              insumos={insumos}
+              insumos={insumosBase}
               onSubmit={handleGuardar}
               onCancel={handleCerrarModal}
             />

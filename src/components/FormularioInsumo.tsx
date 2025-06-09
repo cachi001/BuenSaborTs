@@ -1,15 +1,12 @@
-import type { FormEvent} from 'react'
-import { useState, useEffect } from 'react'
+import { SelectorCategorias } from './SelectorCategorias'
+import { SelectorUnidadMedida } from './SelectorUnidadMedida'
 import { UnidadMedida } from '../classes/UnidadMedidaClass'
+import type { FormEvent} from 'react'
 import type { Categoria } from '../classes/CategoriaClass'
-import type { InsumoDto } from '../pages/Insumo'
-import Modal from './Modal'
-import { FormularioUnidadMedida } from './FormularioUnidadMedida'
-import { useCategoria } from '../context/CategoriaContext'
-import type { CategoriaDto } from '../pages/Categorias'
+import type { CategoriaRequest } from '../pages/Categorias'
+import type { ArticuloInsumo } from '../classes/ArticuloInsumoClass'
 
-
-export interface InsumoRecord {
+export interface InsumoRequest {
     denominacion: string
     precioVenta: number
     precioCompra: number
@@ -17,7 +14,7 @@ export interface InsumoRecord {
     stockMaximo: number
     esParaElaborar: boolean
     unidadMedida: UnidadMedida
-    categoria: CategoriaDto
+    categoria: CategoriaRequest
 }
 
 interface Props {
@@ -41,7 +38,7 @@ interface Props {
     setCategoria: (value: Categoria | null) => void;
     unidadesMedida: UnidadMedida[];
     categorias: Categoria[];
-    onSubmit: (insumo: InsumoDto) => void;
+    onSubmit: (insumo: ArticuloInsumo) => void;
     onCancel: () => void;
 }
 
@@ -68,19 +65,7 @@ export const FormularioInsumo = ({
     onSubmit,
     onCancel
 }: Props) => {
-    const [modalUnidadAbierto, setModalUnidadAbierto] = useState(false)
-    const [denominacionOriginal, setDenominacionOriginal] = useState<string | null>(null);
-    const [modoEdicionUnidad, setModoEdicionUnidad] = useState<boolean> (false)
 
-    const [unidadesMedidasTemp, setUnidadesMedidasTemp] = useState<UnidadMedida[]>([])
-    const listaUnidades = [...unidadesMedida, ...unidadesMedidasTemp];
-
-    const {cargarSubcategorias}= useCategoria()
-    const [categoriaActual, setCategoriaActual] = useState<Categoria | null>(null);
-    const [subcategorias, setSubcategorias] = useState<Categoria[]>([]);
-    const [historialCategorias, setHistorialCategorias] = useState<Categoria[]>([]);
-
-    console.log("UNIDADES DE MEDIDA FORM", unidadesMedida)
     const handleSubmit = (e: FormEvent) => {
         e.preventDefault()
 
@@ -100,7 +85,7 @@ export const FormularioInsumo = ({
             return;
         }
 
-        const nuevoInsumo: InsumoDto = {
+        const nuevoInsumo: ArticuloInsumo = {
             denominacion,
             precioVenta: Number(precioVenta),
             precioCompra: Number(precioCompra),
@@ -113,83 +98,7 @@ export const FormularioInsumo = ({
 
         onSubmit(nuevoInsumo)
     }
-    const seleccionarCategoria = async (categoria: Categoria) => {
-        setCategoria(categoria);
-        setCategoriaActual(categoria);
-        setHistorialCategorias(prev => [...prev, categoria]);
 
-        const hijas = await cargarSubcategorias(categoria.id!);
-        setSubcategorias(hijas);
-    };
-
-    const handleGuardarUnidad = (nuevaUnidad: UnidadMedida) => {
-        setUnidadMedida(nuevaUnidad);
-
-        setUnidadesMedidasTemp(prev => {
-            if (modoEdicionUnidad && denominacionOriginal) {
-                return prev.map(r =>
-                    r.denominacion.trim().toLowerCase() === denominacionOriginal.trim().toLowerCase()
-                        ? nuevaUnidad
-                        : r
-                );
-            } else {
-                const existe = prev.some(r =>
-                    r.denominacion.trim().toLowerCase() === nuevaUnidad.denominacion.trim().toLowerCase()
-                );
-                if (existe) {
-                    return prev;
-                }
-                return [...prev, nuevaUnidad];
-            }
-        });
-
-        setModoEdicionUnidad(true);
-        setModalUnidadAbierto(false);
-    };
-
-    const abrirModalUnidad = (unidad?: UnidadMedida) => {
-        console.log("ABRIENDO MODAL "+ unidad?.denominacion)
-        if (unidad) {
-            setUnidadMedida(unidad);
-            setDenominacionOriginal(unidad.denominacion);
-            setModoEdicionUnidad(true);
-        } else {
-            setUnidadMedida(null);
-            setDenominacionOriginal(null);
-            setModoEdicionUnidad(false);
-        }
-        setModalUnidadAbierto(true);
-    }
-    
-    const volverCategoriaAnterior = async () => {
-        const nuevoHistorial = [...historialCategorias];
-        nuevoHistorial.pop(); // Sacamos la actual
-        const anterior = nuevoHistorial[nuevoHistorial.length - 1] || null;
-
-        setHistorialCategorias(nuevoHistorial);
-        setCategoria(anterior);
-        setCategoriaActual(anterior);
-
-        if (anterior) {
-            const hijas = await cargarSubcategorias(anterior.id!);
-            setSubcategorias(hijas);
-        } else {
-            setSubcategorias([]);
-        }
-    };
-
-    useEffect(() => {
-    const cargarEnEdicion = async () => {
-        if (modoEdicion && categoria) {
-            setCategoriaActual(categoria);
-            setHistorialCategorias([categoria]);
-            const hijas = await cargarSubcategorias(categoria.id!);
-            setSubcategorias(hijas);
-        }
-    };
-
-    cargarEnEdicion();
-}, [modoEdicion, categoria]);
 
     return (
         <div>
@@ -245,79 +154,19 @@ export const FormularioInsumo = ({
 
             {/* Grilla para selects */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="flex flex-col gap-1">
-                    <label className="text-sm font-medium text-gray-700">Unidad de Medida</label>
-                    <select
-                        value={unidadMedida?.denominacion || ""}
-                        onChange={(e) => {
-                            const selected = listaUnidades.find(u => u.denominacion === e.target.value) || null;
-                            setUnidadMedida(selected);
-                        }}
-                        required
-                        className="border border-gray-300 rounded-lg px-3 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-green-400"
-                        >
-                        <option value="" disabled>Seleccione una unidad</option>
-                        {listaUnidades.map((unidad) => (
-                        <option key={unidad.denominacion} value={unidad.denominacion}>
-                            {unidad.denominacion}
-                        </option>
-                        ))}
+                <SelectorUnidadMedida
+                unidadMedida={unidadMedida}
+                setUnidadMedida={setUnidadMedida}
+                unidadesMedida={unidadesMedida}
+                modoEdicion={modoEdicion}
+                />
 
-                    </select>
-
-                    {!modoEdicion && !unidadMedida?.id && (
-                    <button
-                        type="button"
-                        onClick={() => abrirModalUnidad(unidadMedida || undefined)}
-                        className="cursor-pointer mt-2 px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 text-sm"
-                    >
-                        {modoEdicionUnidad ? 'Editar' : '+ Añadir'}
-                    </button>
-                    )}
-
-                    </div>
-
-                    <div className="flex flex-col gap-1">
-                        <label className="text-sm font-medium text-gray-700">
-                            {categoriaActual ? "Subcategorías de:" : "Categoría"}
-                        </label>
-
-                        {categoriaActual && (
-                            <p className="font-semibold text-green-700">{categoriaActual.denominacion}</p>
-                        )}
-
-                        {(categoriaActual && subcategorias.length === 0) ? (
-                            <p className="text-sm text-gray-500 italic">No hay subcategorías disponibles.</p>
-                        ) : (
-                            <select
-                                value={categoria?.id || ""}
-                                onChange={(e) => {
-                                    const id = Number(e.target.value);
-                                    const seleccionada = (categoriaActual ? subcategorias : categorias.filter(c => !c.categoriaPadre)).find(c => c.id === id);
-                                    if (seleccionada) seleccionarCategoria(seleccionada);
-                                }}
-                                required
-                                className="border border-gray-300 rounded-lg px-3 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-green-400"
-                            >
-                                <option value="" disabled>Seleccione una Categoría</option>
-                                {(categoriaActual ? subcategorias : categorias.filter(c => !c.categoriaPadre)).map((cat) => (
-                                    <option key={cat.id} value={cat.id}>
-                                        {cat.denominacion}
-                                    </option>
-                                ))}
-                            </select>
-                        )}
-
-                        {(categoriaActual || historialCategorias.length > 0) && (
-                            <button
-                                type="button"
-                                onClick={volverCategoriaAnterior}
-                                className="cursor-pointer mt-2 px-3 py-1 text-sm bg-gray-300 rounded hover:bg-gray-400"
-                            >
-                                Volver
-                            </button>
-                        )}
-                    </div>
+                <SelectorCategorias 
+                categoriaSeleccionada={categoria}
+                setCategoriaSeleccionada={setCategoria}
+                categoriasRaiz={categorias.filter(c => !c.categoriaPadre)}
+                modoEdicion={modoEdicion}
+                />
 
             </div>
 
@@ -337,18 +186,6 @@ export const FormularioInsumo = ({
                 </button>
             </div>
             </form>
-            {modalUnidadAbierto && (
-                <Modal isOpen={modalUnidadAbierto} onClose={() => setModalUnidadAbierto(false)}
-                titulo={modoEdicionUnidad ? "Editar Unidad Medida" : "Nueva Unidad Medida" }>
-                <FormularioUnidadMedida
-                    onClose={() => setModalUnidadAbierto(false)}
-                    onGuardar={handleGuardarUnidad}
-                    unidadEnEdicion={unidadMedida}
-                    modoEdicion = {modoEdicionUnidad}
-                />
-                
-            </Modal>)
-            }
         </div>
         
     )

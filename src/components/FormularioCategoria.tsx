@@ -1,8 +1,8 @@
 // src/components/FormularioCategorias.tsx
 import React, { useState, useEffect } from 'react'
-import type { Categoria } from '../classes/CategoriaClass'
 import { useCategoria } from '../context/CategoriaContext'
-import type { CategoriaDto } from '../pages/Categorias'
+import type { Categoria } from '../classes/CategoriaClass'
+import type { CategoriaRequest } from '../pages/Categorias'
 
 interface Props {
     onClose: () => void
@@ -12,7 +12,6 @@ interface Props {
 
     export const FormularioCategorias: React.FC<Props> = ({ onClose, modoEdicion, categoriaEnEdicion }) => {
         const { categorias, agregarCategoria, editarCategoria } = useCategoria()
-
 
         const [denominacion, setDenominacion] = useState('')
         const [categoriaPadreId, setCategoriaPadreId] = useState<number | null>(null)
@@ -31,7 +30,7 @@ interface Props {
             e.preventDefault()
             if (!denominacion.trim()) return alert('El nombre de la categoría es obligatorio.')
 
-            const categoriaDto: CategoriaDto = {
+            const categoriaDto: CategoriaRequest = {
             denominacion: denominacion.trim(),
             categoriaPadreId: categoriaPadreId || null,
             }
