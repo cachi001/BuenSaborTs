@@ -5,6 +5,7 @@ import type { FormEvent} from 'react'
 import type { Categoria } from '../classes/CategoriaClass'
 import type { CategoriaRequest } from '../pages/Categorias'
 import type { ArticuloInsumo } from '../classes/ArticuloInsumoClass'
+import type { ImagenArticulo } from '../classes/ImagenArticulo'
 
 export interface InsumoRequest {
     denominacion: string
@@ -13,12 +14,15 @@ export interface InsumoRequest {
     stockActual: number
     stockMaximo: number
     esParaElaborar: boolean
+    imagenes?: ImagenArticulo[]
     unidadMedida: UnidadMedida
     categoria: CategoriaRequest
 }
 
 interface Props {
     modoEdicion: boolean,
+    imagenes: ImagenArticulo[];
+    setImagenes: (value: ImagenArticulo[]) => void;
     setModoEdicion: (value: boolean) => void ,
     denominacion: string;
     setDenominacion: (value: string) => void;
@@ -44,6 +48,8 @@ interface Props {
 
 export const FormularioInsumo = ({
     modoEdicion,
+    imagenes,
+    setImagenes,
     denominacion,
     setDenominacion,
     precioCompra,
@@ -93,7 +99,8 @@ export const FormularioInsumo = ({
             stockMaximo: Number(stockMaximo),
             esParaElaborar,
             unidadMedida,
-            categoria
+            categoria,
+            imagenes
         }
 
         onSubmit(nuevoInsumo)

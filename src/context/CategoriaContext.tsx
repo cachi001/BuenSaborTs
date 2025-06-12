@@ -1,15 +1,16 @@
 import { createContext, useContext } from 'react';
 import type { ReactNode } from 'react';
 import { useCategoriasApi } from '../hooks/useCategoriasApi';
-import type { CategoriaDto } from '../pages/Categorias';
+import type { CategoriaRequest } from '../pages/Categorias';
 import { Categoria } from '../classes/CategoriaClass';
 
 type CategoriaContextType = {
     categorias: Categoria[];
-    agregarCategoria: (nueva: CategoriaDto) => void;
+    agregarCategoria: (nueva: CategoriaRequest) => void;
     cargarCategorias: () => void;
     eliminarCategoria: (id: number) => void;
-    editarCategoria: (id: number, datosActualizados: CategoriaDto) => void;
+    cambiarEstado: (id: number) => void;
+    editarCategoria: (id: number, datosActualizados: CategoriaRequest) => void;
     cargarSubcategorias: (padreId: number ) => Promise<Categoria[]>
     };
 
@@ -34,7 +35,8 @@ type CategoriaContextType = {
         agregarCategoria,
         eliminarCategoria,
         editarCategoria,
-        cargarSubcategorias
+        cargarSubcategorias,
+        cambiarEstado
     } = useCategoriasApi();
 
     return (
@@ -45,7 +47,8 @@ type CategoriaContextType = {
             cargarCategorias,
             eliminarCategoria,
             editarCategoria,
-            cargarSubcategorias
+            cargarSubcategorias,
+            cambiarEstado
         }}
         >
         {children}

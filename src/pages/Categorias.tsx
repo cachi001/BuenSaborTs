@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import HeaderAdmin from '../components/HeaderAdmin'
 import SideBar from '../components/SideBar'
 import { Boton } from '../components/Boton'
@@ -22,6 +22,8 @@ export const Categorias = () => {
     const {
         categorias,
         eliminarCategoria,
+        cargarCategorias,
+        cambiarEstado
     } = useCategoria()
 
     const [isModalOpen, setIsModalOpen] = useState(false)
@@ -29,6 +31,10 @@ export const Categorias = () => {
     const [categoriaAEliminar, setCategoriaAEliminar] = useState<Categoria | null>(null)
     const [modoEdicion, setModoEdicion] = useState(false)
     const [categoriaEnEdicion, setCategoriaEnEdicion] = useState<Categoria | null>(null)
+
+    console.log("CATEGORIAAAAAAAAAS",categorias)
+
+    console.log("EDICION", categoriaEnEdicion)
 
     const handleAbrirModal = () => {
         setModoEdicion(false)
@@ -45,6 +51,9 @@ export const Categorias = () => {
     const handleEliminar = (categoria: Categoria) => {
         setCategoriaAEliminar(categoria)
         setModalEliminarAbierto(true)
+    }
+    const handleSwitchState = (id: number) => {
+        cambiarEstado(id)
     }
 
     const confirmarEliminar = () => {
@@ -66,6 +75,9 @@ export const Categorias = () => {
         setCategoriaEnEdicion(null)
     }
 
+    useEffect(() =>{
+        cargarCategorias()
+    },[])
 
     return (
         <div className="min-h-screen flex flex-col">
@@ -90,14 +102,23 @@ export const Categorias = () => {
                                 <tr>
                                     <th className="px-6 py-3">Denominación</th>
                                     <th className="px-6 py-3">Categoría Padre</th>
+                                    <th className="px-6 py-3">Estado</th>
                                     <th className="px-6 py-3">Acciones</th>
                                 </tr>
                             </thead>
                             <tbody className="text-gray-800">
                                 {categorias.map((cat) => (
-                                    <tr key={cat.id} className="border-b hover:bg-gray-50">
+                                    <tr key={cat.id} className="border-b border-gray-300 hover:bg-gray-50">
                                         <td className="px-6 py-4 font-medium">{cat.denominacion}</td>
                                         <td className="px-6 py-4">{cat.categoriaPadre?.denominacion ?? '—'}</td>
+                                        <td className="px-4 py-2">
+                                            <span
+                                                className={`inline-block w-6 h-6 rounded-full ${
+                                                cat.activo ? 'bg-green-500' : 'bg-red-500'
+                                                }`}
+                                                title={cat.activo ? 'Habiltado' : 'Deshabilitado'}
+                                            ></span>
+                                        </td>
                                         <td className="px-6 py-4">
                                             <div className="flex items-center justify-center gap-4">
                                                 <button
@@ -105,6 +126,12 @@ export const Categorias = () => {
                                                     onClick={() => handleEditar(cat)}
                                                 >
                                                     Editar
+                                                </button>
+                                                <button
+                                                    className="cursor-pointer rounded-md min-w-24 py-2 text-white bg-orange-500 hover:bg-orange-300"
+                                                    onClick={() => handleSwitchState(cat.id!)}
+                                                >
+                                                    {cat.activo ? "Desactivar" : "Activar"}
                                                 </button>
                                                 <button
                                                     className="cursor-pointer rounded-md px-6 py-2 text-white bg-red-500 hover:bg-red-300"
@@ -156,6 +183,8 @@ export const Categorias = () => {
                     onClose={handleCerrarModal}
                     modoEdicion={modoEdicion}
                     categoriaEnEdicion={categoriaEnEdicion}
+                    categorias={categorias}
+                    setCategoriaEnEdicion={setCategoriaEnEdicion}
                 />
             </Modal>
         </div>

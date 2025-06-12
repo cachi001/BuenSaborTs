@@ -81,7 +81,22 @@ export function useManufacturadoApi() {
             console.error("Error al eliminar manufacturado:", error);
         }
     };
+    const cambiarEstado = async (id: number) => {
+        try {
+        const res = await fetch(`http://localhost:8080/articulo-manufacturado/switch-state/${id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+        });
+        if (!res.ok) throw new Error('Error al cambiar estado manufacturado');
+        const actualizado = await res.json(); //
 
+        setManufacturados(prev =>
+            prev.map(man => (man.id === id ? actualizado : man))
+        );
+        } catch (error) {
+        console.error('Error al cambiar Estado manufacturado:', error);
+        }
+    };
     useEffect(() => {
         fetchManufacturados();
     }, []);
@@ -92,5 +107,6 @@ export function useManufacturadoApi() {
         agregarManufacturado,
         actualizarManufacturado,
         eliminarManufacturado,
+        cambiarEstado
     };
 }

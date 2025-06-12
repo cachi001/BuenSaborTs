@@ -9,12 +9,12 @@ export class ArticuloManufacturado {
     descripcion: string;
     tiempoEstimado: number;
     preparacion: string;
+    activo?: boolean;
     unidadMedida: UnidadMedida;
     categoria: Categoria;
     articuloManufacturadoDetalles: ArticuloManufacturadoDetalle[] = [];
 
     constructor(
-        id: number,
         denominacion: string,
         precioVenta: number,
         descripcion: string,
@@ -22,7 +22,9 @@ export class ArticuloManufacturado {
         preparacion: string,
         unidadMedida: UnidadMedida,
         categoria: Categoria,
-        articuloManufacturadoDetalles: ArticuloManufacturadoDetalle[] = []
+        articuloManufacturadoDetalles: ArticuloManufacturadoDetalle[] = [],
+        id?: number,
+        activo?: boolean
     ) {
         this.id = id;
         this.denominacion = denominacion;
@@ -33,5 +35,6 @@ export class ArticuloManufacturado {
         this.unidadMedida = unidadMedida;
         this.categoria = categoria;
         this.articuloManufacturadoDetalles = articuloManufacturadoDetalles;
+        this.activo = activo;
     }
 }

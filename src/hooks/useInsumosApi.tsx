@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { ArticuloInsumo } from "../classes/ArticuloInsumoClass";
 import { UnidadMedida } from "../classes/UnidadMedidaClass";
-import { Categoria } from "../classes/CategoriaClass";
 import type { InsumoRequest } from "../components/FormularioInsumo";
 import type { ArticuloInsumoBase } from "../classes/ArticuloManufacturadoDetalleClass";
 
@@ -57,9 +56,9 @@ export function useInsumosApi() {
             categoria: {
                 denominacion: nuevo.categoria.denominacion,
                 categoriaPadreId: nuevo.categoria.categoriaPadre?.id || null
-                }
+                },
         }
-        console.log(insumoNew)
+        console.log("INSUMO NUEVO", insumoNew)
         try {
             
         const res = await fetch("http://localhost:8080/articulo-insumo/crear", {
@@ -69,23 +68,7 @@ export function useInsumosApi() {
         });
         if (!res.ok) throw new Error("Error al agregar insumo");
         const data: ArticuloInsumo = await res.json();
-        const categoria = new Categoria(
-            data.categoria.denominacion,
-            data.categoria.categoriaPadre,
-            data.categoria.id
-        );
-        const nuevoInsumo = new ArticuloInsumo(
-            data.denominacion,
-            data.precioVenta,
-            data.precioCompra,
-            data.stockActual,
-            data.stockMaximo,
-            data.esParaElaborar,
-            data.unidadMedida,
-            categoria,
-            data.id
-        );
-        setInsumos((prev) => [...prev, nuevoInsumo]);
+        setInsumos((prev) => [...prev, data]);
         } catch (error) {
         console.error("Error al agregar insumo:", error);
         }
@@ -119,7 +102,23 @@ export function useInsumosApi() {
         console.error("Error al eliminar insumo:", error);
         }
     };
+    const cambiarEstado = async (id: number) => {
+        try {
+        const res = await fetch(`http://localhost:8080/articulo-insumo/switch-state`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(id)
+        });
+        if (!res.ok) throw new Error('Error al cambiar estado Insumo');
+        const actualizado = await res.json(); //
 
+        setInsumos(prev =>
+            prev.map(ins => (ins.id === id ? actualizado : ins))
+        );
+        } catch (error) {
+        console.error('Error al cambiar Estado Insumo:', error);
+        }
+    };
     useEffect(() => {
         fetchInsumos();
         fetchUnidadesMedida();
@@ -135,5 +134,6 @@ export function useInsumosApi() {
         agregarInsumo,
         editarInsumo,
         eliminarInsumo,
+        cambiarEstado
     };
 }

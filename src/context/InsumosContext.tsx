@@ -10,9 +10,10 @@ interface InsumosContextType {
     unidadesMedida: UnidadMedida[];
     fetchInsumos: () => void;
     fetchInsumosBase: () => void;
-    agregarInsumo: (nuevo: ArticuloInsumo) => Promise<void>;
-    editarInsumo: (id: number, actualizado: ArticuloInsumo) => Promise<void>;
-    eliminarInsumo: (id: number) => Promise<void>;
+    agregarInsumo: (nuevo: ArticuloInsumo) => void;
+    editarInsumo: (id: number, actualizado: ArticuloInsumo) => void;
+    cambiarEstado: (id: number) => void
+    eliminarInsumo: (id: number) => void;
     fetchUnidadesMedida: () => void
 }
 
@@ -31,6 +32,7 @@ export const InsumosProvider: React.FC<{ children: React.ReactNode }> = ({ child
         insumos,
         insumosBase,
         unidadesMedida,
+        cambiarEstado,
         fetchInsumos,
         fetchInsumosBase,
         agregarInsumo,
@@ -45,6 +47,7 @@ export const InsumosProvider: React.FC<{ children: React.ReactNode }> = ({ child
                 insumos,
                 insumosBase,
                 unidadesMedida,
+                cambiarEstado,
                 fetchInsumos,
                 fetchInsumosBase,
                 agregarInsumo,

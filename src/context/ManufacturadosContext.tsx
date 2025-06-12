@@ -9,6 +9,7 @@ interface ManufacturadosContextType {
     agregarManufacturado: (nuevo: ArticuloManufacturado) => Promise<void>;
     actualizarManufacturado: (id: number, actualizado: ArticuloManufacturado) => Promise<void>;
     eliminarManufacturado: (id: number) => Promise<void>;
+    cambiarEstado: (id: number) => void;
 }
 
 const ManufacturadosContext = createContext<ManufacturadosContextType | undefined>(undefined);
@@ -28,6 +29,7 @@ export const ManufacturadoProvider: React.FC<{ children: React.ReactNode }> = ({
         agregarManufacturado,
         actualizarManufacturado,
         eliminarManufacturado,
+        cambiarEstado
     } = useManufacturadoApi();
 
     return (
@@ -38,6 +40,7 @@ export const ManufacturadoProvider: React.FC<{ children: React.ReactNode }> = ({
                 agregarManufacturado,
                 actualizarManufacturado,
                 eliminarManufacturado,
+                cambiarEstado
             }}
         >
             {children}

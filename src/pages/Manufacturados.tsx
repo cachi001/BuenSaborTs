@@ -12,7 +12,7 @@ import { useCategoria } from '../context/CategoriaContext'
 import { useInsumos } from '../context/InsumosContext'
 
 export const Manufacturados = () => {
-  const { manufacturados, agregarManufacturado, actualizarManufacturado, eliminarManufacturado} = useManufacturados()
+  const { manufacturados, fetchManufacturados, agregarManufacturado,cambiarEstado, actualizarManufacturado, eliminarManufacturado} = useManufacturados()
   const { fetchUnidadesMedida, unidadesMedida, fetchInsumosBase, insumosBase } = useInsumos()
   const { categorias } = useCategoria()
 
@@ -30,6 +30,9 @@ export const Manufacturados = () => {
   const [categoria, setCategoria] = useState<Categoria | null>(null)
   const [detalles, setDetalles] = useState<any[]>([])
 
+  const handleSwitchState = (id: number) =>{
+    cambiarEstado(id)
+  }
   const limpiarCampos = () => {
     setDenominacion('')
     setPrecioVenta('')
@@ -81,6 +84,7 @@ export const Manufacturados = () => {
   useEffect(() => {
     fetchInsumosBase()
     fetchUnidadesMedida()
+    fetchManufacturados()
   }, [])
 
   return (
@@ -109,12 +113,13 @@ export const Manufacturados = () => {
                   <th className="px-4 py-3">Preparación</th>
                   <th className="px-4 py-3">Unidad Medida</th>
                   <th className="px-4 py-3">Categoría</th>
+                  <th className="px-4 py-3">Estado</th>
                   <th className="px-4 py-3">Acciones</th>
                 </tr>
               </thead>
               <tbody>
                 {manufacturados.map((manu: ArticuloManufacturado) => (
-                  <tr key={manu.id} className="border-b">
+                  <tr key={manu.id} className="border-b border-gray-300">
                     <td className="px-4 py-2">{manu.denominacion}</td>
                     <td className="px-4 py-2">${manu.precioVenta.toFixed(2)}</td>
                     <td className="px-4 py-2">{manu.descripcion}</td>
@@ -122,10 +127,24 @@ export const Manufacturados = () => {
                     <td className="px-4 py-2">{manu.preparacion}</td>
                     <td className="px-4 py-2">{manu.unidadMedida?.denominacion || '-'}</td>
                     <td className="px-4 py-2">{manu.categoria?.denominacion || '-'}</td>
+                    <td className="px-4 py-2">
+                      <span
+                        className={`inline-block w-6 h-6 rounded-full ${
+                          manu.activo ? 'bg-green-500' : 'bg-red-500'
+                        }`}
+                        title={manu.activo ? 'Habiltado' : 'Deshabilitado'}
+                      ></span>
+                    </td>
                     <td className="px-4 py-2 flex gap-4">
                       <button className="bg-blue-500 hover:bg-blue-300 text-white px-4 py-2 rounded-md"
                         onClick={() => handleEditar(manu)}>
                         Editar
+                      </button>
+                      <button
+                          className="cursor-pointer rounded-md min-w-24 py-2 text-white bg-orange-500 hover:bg-orange-300"
+                          onClick={() => handleSwitchState(manu.id!)}
+                      >
+                          {manu.activo ? "Desactivar" : "Activar"}
                       </button>
                       <button className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md"
                         onClick={() => eliminarManufacturado(manu.id!)}>

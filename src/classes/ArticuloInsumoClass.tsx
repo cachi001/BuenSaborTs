@@ -1,4 +1,5 @@
 import { Categoria } from "./CategoriaClass";
+import type { ImagenArticulo } from "./ImagenArticulo";
 import { UnidadMedida } from "./UnidadMedidaClass";
 
 export class ArticuloInsumo {
@@ -9,8 +10,10 @@ export class ArticuloInsumo {
     stockActual: number;
     stockMaximo: number;
     esParaElaborar: boolean;
+    activo?: boolean;
     unidadMedida: UnidadMedida;
     categoria: Categoria;
+    imagenes?: ImagenArticulo[];
 
     constructor(
         denominacion: string,
@@ -21,7 +24,9 @@ export class ArticuloInsumo {
         esParaElaborar: boolean,
         unidadMedida: UnidadMedida,
         categoria: Categoria,
-        id?: number
+        imagenes?: ImagenArticulo[],
+        activo?: boolean,
+        id?: number,
     ) {
         this.id = id;
         this.denominacion = denominacion;
@@ -30,7 +35,9 @@ export class ArticuloInsumo {
         this.stockActual = stockActual;
         this.stockMaximo = stockMaximo;
         this.esParaElaborar = esParaElaborar;
+        this.activo = activo;
         this.unidadMedida = unidadMedida;
         this.categoria = categoria;
+        this.imagenes = imagenes;
     }
 }

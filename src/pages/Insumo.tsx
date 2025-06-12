@@ -1,4 +1,6 @@
 import { useEffect, useState } from 'react'
+import { useInsumos } from '../context/InsumosContext'
+import { useCategoria } from '../context/CategoriaContext'
 import HeaderAdmin from '../components/HeaderAdmin'
 import SideBar from '../components/SideBar'
 import { Boton } from '../components/Boton'
@@ -6,12 +8,11 @@ import { Modal } from '../components/Modal'
 import { FormularioInsumo} from '../components/FormularioInsumo'
 import type { ArticuloInsumo } from '../classes/ArticuloInsumoClass'
 import type { Categoria } from '../classes/CategoriaClass'
+import { ImagenArticulo } from '../classes/ImagenArticulo'
 import type { UnidadMedida } from '../classes/UnidadMedidaClass'
-import { useInsumos } from '../context/InsumosContext'
-import { useCategoria } from '../context/CategoriaContext'
 
 export const Insumos = () => {
-  const { insumos, agregarInsumo, editarInsumo, eliminarInsumo, unidadesMedida, fetchUnidadesMedida } = useInsumos()
+  const { insumos, agregarInsumo,fetchInsumos, editarInsumo, eliminarInsumo, cambiarEstado, unidadesMedida, fetchUnidadesMedida } = useInsumos()
   const { categorias } = useCategoria();
 
   const [isModalOpen, setIsModalOpen] = useState(false)
@@ -21,6 +22,7 @@ export const Insumos = () => {
   const [insumoEnEdicion, setInsumoEnEdicion] = useState<ArticuloInsumo | null>(null)
 
   // Estados controlados para el formulario
+  const [imagenes, setImagenes] = useState<ImagenArticulo[]>([])
   const [denominacion, setDenominacion] = useState('')
   const [precioCompra, setPrecioCompra] = useState<number | ''>('')
   const [precioVenta, setPrecioVenta] = useState<number | ''>('')
@@ -29,6 +31,7 @@ export const Insumos = () => {
   const [esParaElaborar, setEsParaElaborar] = useState(false)
   const [unidadMedida, setUnidadMedida] = useState<UnidadMedida | null>(null)
   const [categoria, setCategoria] = useState<Categoria | null>(null)
+  
 
   console.log("INSUMOS: ", insumos)
   console.log("UNIDAD MEDIDA INSUMO ", unidadMedida)
@@ -41,6 +44,9 @@ export const Insumos = () => {
     setIsModalOpen(true)
   }
 
+  const handleSwitchState  = (id: number) =>{
+    cambiarEstado(id)
+  }
   // Cuando abro el modal para editar un insumo
   const handleEditar = (insumo: ArticuloInsumo) => {
     console.log("EDITANDO ARITUCLO INSUMO")
@@ -57,6 +63,7 @@ export const Insumos = () => {
     setEsParaElaborar(insumo.esParaElaborar)
     setUnidadMedida(insumo.unidadMedida || null)
     setCategoria(insumo.categoria || null)
+    setImagenes(insumo.imagenes || [])
 
     setIsModalOpen(true)
   }
@@ -70,6 +77,8 @@ export const Insumos = () => {
     setEsParaElaborar(false)
     setUnidadMedida(null)
     setCategoria(null)
+    setImagenes([])
+
   }
 
   const handleCerrarModal = () => {
@@ -91,6 +100,7 @@ export const Insumos = () => {
 
   useEffect(() => {
     fetchUnidadesMedida()
+    fetchInsumos()
   }, [])
 
   return (
@@ -121,15 +131,16 @@ export const Insumos = () => {
                   <th className="px-4 py-3 whitespace-nowrap">Para Elaborar</th>
                   <th className="px-4 py-3 whitespace-nowrap">Unidad de Medida</th>
                   <th className="px-4 py-3 whitespace-nowrap">Categoría</th>
+                  <th className="px-4 py-3 whitespace-nowrap">Estado</th>
                   <th className="px-4 py-3 whitespace-nowrap">Acciones</th>
                 </tr>
               </thead>
               <tbody>
                 {insumos.map((insumo) => (
-                  <tr key={insumo.id} className="border-b">
+                  <tr key={insumo.id} className="border-b border-gray-300">
                     <td className="px-4 py-2">{insumo.denominacion}</td>
-                    <td className="px-4 py-2">${insumo.precioCompra.toFixed(2)}</td>
-                    <td className="px-4 py-2">${insumo.precioVenta.toFixed(2)}</td>
+                    <td className="px-4 py-2">${insumo.precioCompra}</td>
+                    <td className="px-4 py-2">${insumo.precioVenta} </td>
                     <td className="px-4 py-2">{insumo.stockActual}</td>
                     <td className="px-4 py-2">{insumo.stockMaximo}</td>
                     <td className="px-4 py-2">
@@ -142,12 +153,26 @@ export const Insumos = () => {
                     </td>
                     <td className="px-6 py-2">{insumo.unidadMedida?.denominacion || "-"}</td>
                     <td className="px-6 py-2">{insumo.categoria?.denominacion || "-"}</td>
+                    <td className="px-4 py-2">
+                      <span
+                        className={`inline-block w-6 h-6 rounded-full ${
+                          insumo.activo ? 'bg-green-500' : 'bg-red-500'
+                        }`}
+                        title={insumo.activo ? 'Habiltado' : 'Deshabilitado'}
+                      ></span>
+                    </td>
                     <td className="px-6 py-2 flex gap-4">
                       <button
                         className="cursor-pointer rounded-md px-6 py-2 text-white bg-blue-500 hover:bg-blue-300"
                         onClick={() => handleEditar(insumo)}
                       >
                         Editar
+                      </button>
+                      <button
+                          className="cursor-pointer rounded-md min-w-24 py-2 text-white bg-orange-500 hover:bg-orange-300"
+                          onClick={() => handleSwitchState(insumo.id!)}
+                      >
+                          {insumo.activo ? "Desactivar" : "Activar"}
                       </button>
                       <button
                         className="cursor-pointer bg-red-500 hover:bg-red-600 text-white px-6 py-2 rounded-md"
@@ -170,6 +195,8 @@ export const Insumos = () => {
           className="bg-white rounded-2xl p-4 max-w-4xl w-full shadow-lg">
             <FormularioInsumo
               modoEdicion={modoEdicion}
+              imagenes={imagenes}
+              setImagenes={setImagenes}
               setModoEdicion={setModoEdicion}
               denominacion={denominacion}
               setDenominacion={setDenominacion}

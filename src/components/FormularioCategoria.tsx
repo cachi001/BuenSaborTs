@@ -1,6 +1,7 @@
 // src/components/FormularioCategorias.tsx
 import React, { useState, useEffect } from 'react'
 import { useCategoria } from '../context/CategoriaContext'
+import { SelectorCategorias } from './SelectorCategorias'
 import type { Categoria } from '../classes/CategoriaClass'
 import type { CategoriaRequest } from '../pages/Categorias'
 
@@ -8,10 +9,12 @@ interface Props {
     onClose: () => void
     modoEdicion: boolean
     categoriaEnEdicion: Categoria | null
+    categorias: Categoria[] 
+    setCategoriaEnEdicion: (value: Categoria | null) => void
     }
 
-    export const FormularioCategorias: React.FC<Props> = ({ onClose, modoEdicion, categoriaEnEdicion }) => {
-        const { categorias, agregarCategoria, editarCategoria } = useCategoria()
+    export const FormularioCategorias: React.FC<Props> = ({ onClose, modoEdicion, categoriaEnEdicion, categorias, setCategoriaEnEdicion}) => {
+        const {agregarCategoria, editarCategoria } = useCategoria()
 
         const [denominacion, setDenominacion] = useState('')
         const [categoriaPadreId, setCategoriaPadreId] = useState<number | null>(null)
@@ -59,26 +62,36 @@ interface Props {
                 />
             </div>
 
-            <div className="flex flex-col gap-2">
-                <label className="text-sm font-medium text-gray-700">Categoría Padre</label>
-                <select
-                className="focus:outline-none focus:ring-1 focus:ring-green-400 border border-gray-200 py-2 px-2 w-full rounded-md shadow-sm"
-                value={categoriaPadreId ?? ''}
-                onChange={(e) => setCategoriaPadreId(e.target.value ? Number(e.target.value) : null)}
-                >
-                <option value="" disabled>Ninguna</option>
+            {modoEdicion && categoriaEnEdicion?.categoriaPadre ?
+                (<SelectorCategorias 
+                categoriaSeleccionada={categorias.find(c => c.id === categoriaPadreId) || null}
+                categoriaEnEdicion={categoriaEnEdicion }
+                setCategoriaSeleccionada={(categoria) => setCategoriaPadreId(categoria?.id ?? null)}
+                categoriasRaiz={categorias.filter(c => !c.categoriaPadre && c.id !== categoriaEnEdicion?.id)}
+                modoEdicion={modoEdicion}
+                />
+                ) : modoEdicion && !categoriaEnEdicion?.categoriaPadre ? (
+                    <div className="flex flex-col gap-2">
+                        <label className="text-sm font-medium text-gray-700">Categoría Padre</label>
+                        <select
+                        className="focus:outline-none focus:ring-1 focus:ring-green-400 border border-gray-200 py-2 px-2 w-full rounded-md shadow-sm"
+                        value={categoriaPadreId ?? ''}
+                        onChange={(e) => setCategoriaPadreId(e.target.value ? Number(e.target.value) : null)}
+                        >
+                        <option value="" disabled>Ninguna</option>
+                        </select>
+                    </div>
+                ):(
+                    <SelectorCategorias 
+                    categoriaEnEdicion={categoriaEnEdicion }
+                    categoriaSeleccionada={categorias.find(c => c.id === categoriaPadreId) || null}
+                    setCategoriaSeleccionada={(categoria) => setCategoriaPadreId(categoria?.id ?? null)}
+                    categoriasRaiz={categorias.filter(c => !c.categoriaPadre)}
+                    modoEdicion={modoEdicion}
+                    />
+                )
+            }
 
-                {(!modoEdicion || categoriaEnEdicion?.categoriaPadre) &&
-                    categorias
-                    .filter((c) => c.id !== categoriaEnEdicion?.id)
-                    .map((cat) => (
-                        <option key={cat.id} value={cat.id}>
-                        {cat.denominacion}
-                        </option>
-                    ))}
-                </select>
-
-            </div>
 
             <div className="flex justify-end">
                 <button
