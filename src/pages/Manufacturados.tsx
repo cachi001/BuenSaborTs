@@ -4,12 +4,13 @@ import SideBar from '../components/SideBar'
 import { Boton } from '../components/Boton'
 import { Modal } from '../components/Modal'
 import { FormularioManufacturado } from '../components/FormularioManufacturado'
-import type { ArticuloManufacturado } from '../classes/ArticuloManufacturadoClass'
-import type { Categoria } from '../classes/CategoriaClass'
-import type { UnidadMedida } from '../classes/UnidadMedidaClass'
 import { useManufacturados } from '../context/ManufacturadosContext'
 import { useCategoria } from '../context/CategoriaContext'
 import { useInsumos } from '../context/InsumosContext'
+import type { ArticuloManufacturado } from '../classes/ArticuloManufacturadoClass'
+import type { Categoria } from '../classes/CategoriaClass'
+import type { UnidadMedida } from '../classes/UnidadMedidaClass'
+import { ImagenArticulo } from '../classes/ImagenArticulo'
 
 export const Manufacturados = () => {
   const { manufacturados, fetchManufacturados, agregarManufacturado,cambiarEstado, actualizarManufacturado, eliminarManufacturado} = useManufacturados()
@@ -21,6 +22,7 @@ export const Manufacturados = () => {
   const [manufacturadoEnEdicion, setManufacturadoEnEdicion] = useState<ArticuloManufacturado | null>(null)
 
   //Estados para el formulario
+  const [imagenes, setImagenes] = useState<ImagenArticulo[]>([])
   const [denominacion, setDenominacion] = useState('')
   const [precioVenta, setPrecioVenta] = useState<number | ''>('')
   const [descripcion, setDescripcion] = useState('')
@@ -42,6 +44,7 @@ export const Manufacturados = () => {
     setUnidadMedida(null)
     setCategoria(null)
     setDetalles([])
+    setImagenes([])
   }
 
   const handleAbrirModal = () => {
@@ -61,6 +64,7 @@ export const Manufacturados = () => {
     setUnidadMedida(manufacturado.unidadMedida)
     setCategoria(manufacturado.categoria)
     setDetalles(manufacturado.articuloManufacturadoDetalles)
+    setImagenes(manufacturado.imagenes || [])
     setModoEdicion(true)
     setIsModalOpen(true)
   }
@@ -106,6 +110,7 @@ export const Manufacturados = () => {
             <table className="w-full bg-white text-center text-gray-700">
               <thead className="bg-gray-200 text-gray-700 font-semibold text-sm">
                 <tr>
+                  <th className="px-4 py-3">Imagen</th>
                   <th className="px-4 py-3">Denominación</th>
                   <th className="px-4 py-3">Precio Venta</th>
                   <th className="px-4 py-3">Descripción</th>
@@ -120,6 +125,9 @@ export const Manufacturados = () => {
               <tbody>
                 {manufacturados.map((manu: ArticuloManufacturado) => (
                   <tr key={manu.id} className="border-b border-gray-300">
+                    <td className="px-4 py-2">
+                      <img src={manu.imagenes![0].urlImagen} alt={manu.denominacion} />
+                    </td>
                     <td className="px-4 py-2">{manu.denominacion}</td>
                     <td className="px-4 py-2">${manu.precioVenta.toFixed(2)}</td>
                     <td className="px-4 py-2">{manu.descripcion}</td>
@@ -164,6 +172,8 @@ export const Manufacturados = () => {
             className="bg-white rounded-2xl p-6 max-w-7xl w-full shadow-lg"
           >
             <FormularioManufacturado
+              imagenes={imagenes}
+              setImagenes={setImagenes}
               modoEdicion={modoEdicion}
               setModoEdicion={setModoEdicion}
               denominacion={denominacion}

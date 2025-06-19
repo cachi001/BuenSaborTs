@@ -131,8 +131,9 @@ export const Categorias = () => {
                                                     className="cursor-pointer rounded-md min-w-24 py-2 text-white bg-orange-500 hover:bg-orange-300"
                                                     onClick={() => handleSwitchState(cat.id!)}
                                                 >
-                                                    {cat.activo ? "Desactivar" : "Activar"}
+                                                {cat.activo ? "Desactivar" : "Activar"}
                                                 </button>
+   
                                                 <button
                                                     className="cursor-pointer rounded-md px-6 py-2 text-white bg-red-500 hover:bg-red-300"
                                                     onClick={() => handleEliminar(cat)}

@@ -6,9 +6,9 @@ import SideBar from '../components/SideBar'
 import { Boton } from '../components/Boton'
 import { Modal } from '../components/Modal'
 import { FormularioInsumo} from '../components/FormularioInsumo'
+import { ImagenArticulo } from '../classes/ImagenArticulo'
 import type { ArticuloInsumo } from '../classes/ArticuloInsumoClass'
 import type { Categoria } from '../classes/CategoriaClass'
-import { ImagenArticulo } from '../classes/ImagenArticulo'
 import type { UnidadMedida } from '../classes/UnidadMedidaClass'
 
 export const Insumos = () => {
@@ -17,9 +17,13 @@ export const Insumos = () => {
 
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [modoEdicion, setModoEdicion] = useState(false)
+  const [modalEliminar, setModalEliminar] = useState(false)
 
   //Insumo en Edicion
   const [insumoEnEdicion, setInsumoEnEdicion] = useState<ArticuloInsumo | null>(null)
+
+  //Insumo a Eliminar
+  const [insumoAEliminar, setInsumoAEliminar] = useState<ArticuloInsumo | null>(null)
 
   // Estados controlados para el formulario
   const [imagenes, setImagenes] = useState<ImagenArticulo[]>([])
@@ -42,6 +46,24 @@ export const Insumos = () => {
     setInsumoEnEdicion(null)
     limpiarCampos()
     setIsModalOpen(true)
+  }
+
+  const handleEliminar = (insumo: ArticuloInsumo) => {
+      setInsumoAEliminar(insumo)
+      setModalEliminar(true)
+  }
+
+  const confirmarEliminar = () => {
+      if (insumoAEliminar?.id !== undefined) {
+          eliminarInsumo(insumoAEliminar.id)
+      }
+      setInsumoAEliminar(null)
+      setModalEliminar(false)
+  }
+
+  const cancelarEliminar = () => {
+      setInsumoAEliminar(null)
+      setModalEliminar(false)
   }
 
   const handleSwitchState  = (id: number) =>{
@@ -123,6 +145,7 @@ export const Insumos = () => {
             <table className="w-full bg-white text-center text-gray-700">
               <thead className="bg-gray-200 text-gray-700 font-semibold text-sm">
                 <tr>
+                  <th className="px-4 py-3 whitespace-nowrap">Imagen</th>
                   <th className="px-4 py-3 whitespace-nowrap">Denominación</th>
                   <th className="px-4 py-3 whitespace-nowrap">Precio Compra</th>
                   <th className="px-4 py-3 whitespace-nowrap">Precio Venta</th>
@@ -138,6 +161,9 @@ export const Insumos = () => {
               <tbody>
                 {insumos.map((insumo) => (
                   <tr key={insumo.id} className="border-b border-gray-300">
+                    <td className="px-4 py-2">
+                      <img src={insumo.imagenes![0].urlImagen} alt={insumo.denominacion} className='rounded-md' />
+                    </td>
                     <td className="px-4 py-2">{insumo.denominacion}</td>
                     <td className="px-4 py-2">${insumo.precioCompra}</td>
                     <td className="px-4 py-2">${insumo.precioVenta} </td>
@@ -176,7 +202,7 @@ export const Insumos = () => {
                       </button>
                       <button
                         className="cursor-pointer bg-red-500 hover:bg-red-600 text-white px-6 py-2 rounded-md"
-                        onClick={() => eliminarInsumo(insumo.id!)}
+                        onClick={() => handleEliminar(insumo)}
                       >
                         Eliminar
                       </button>
@@ -192,7 +218,7 @@ export const Insumos = () => {
           isOpen={isModalOpen} 
           onClose={handleCerrarModal} 
           titulo={modoEdicion ? "Editar Insumo" : "Nuevo Insumo" } 
-          className="bg-white rounded-2xl p-4 max-w-4xl w-full shadow-lg">
+          className="bg-white rounded-2xl p-4 max-w-6xl w-full shadow-lg">
             <FormularioInsumo
               modoEdicion={modoEdicion}
               imagenes={imagenes}
@@ -220,6 +246,32 @@ export const Insumos = () => {
               onCancel={handleCerrarModal}
             />
           </Modal>
+          <Modal
+            isOpen={modalEliminar}
+            onClose={cancelarEliminar}
+            titulo="Confirmar Eliminación"
+        >
+            <div className="text-center">
+                <p className="mb-4">
+                    ¿Estás seguro de que querés eliminar el insumo{' '}
+                    <strong>{insumoAEliminar?.denominacion}</strong>?
+                </p>
+                <div className="flex justify-center gap-4">
+                    <button
+                        className="cursor-pointer bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded"
+                        onClick={cancelarEliminar}
+                    >
+                        Cancelar
+                    </button>
+                    <button
+                        className="cursor-pointer bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded"
+                        onClick={confirmarEliminar}
+                    >
+                        Eliminar
+                    </button>
+                </div>
+            </div>
+        </Modal>
         </main>
       </div>
     </div>

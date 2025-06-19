@@ -82,7 +82,7 @@ export const SelectorCategorias = ({
 
     return (
         <div className="flex flex-col gap-1">
-            <div className='flex gap-2 items-center mb-2'>
+            <div className='flex gap-2 items-center'>
                 <label className="text-sm font-medium text-gray-700">
                     {categoriaActual ? "Subcategorías de la Categoria Seleccionada:" : "Categoría"}
                 </label>
@@ -101,6 +101,7 @@ export const SelectorCategorias = ({
                         const seleccionada = opciones.find(c => c.id === id)
                         if (seleccionada) seleccionarCategoria(seleccionada)
                     }}
+                    required={!categoriaActual} 
                     className="cursor-pointer border border-gray-300 rounded-lg px-3 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-green-400"
                 >
                     <option value="" disabled>Seleccione una Categoría</option>
@@ -116,7 +117,7 @@ export const SelectorCategorias = ({
                 <button
                     type="button"
                     onClick={volverCategoriaAnterior}
-                    className="cursor-pointer mt-2 px-3 py-1 text-sm bg-gray-300 rounded hover:bg-gray-400"
+                    className="cursor-pointer mt-1 px-3 py-1 text-sm bg-gray-300 rounded hover:bg-gray-400"
                 >
                     Volver
                 </button>

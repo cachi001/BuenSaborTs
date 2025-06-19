@@ -20,6 +20,18 @@ export const SideBar = () => {
                 <Link to="/manufacturados" className='hover:text-yellow-300 text-lg hover:bg-yellow-900 px-2 py-1 rounded'>
                     Manufacturados
                 </Link>
+                <Link to="/clientes" className='hover:text-yellow-300 text-lg hover:bg-yellow-900 px-2 py-1 rounded'>
+                    Clientes
+                </Link>
+                <Link to="/empleados" className='hover:text-yellow-300 text-lg hover:bg-yellow-900 px-2 py-1 rounded'>
+                    Empleados
+                </Link>
+                <Link to="/cocina" className='hover:text-yellow-300 text-lg hover:bg-yellow-900 px-2 py-1 rounded'>
+                    Cocina
+                </Link>
+                <Link to="/pedidos" className='hover:text-yellow-300 text-lg hover:bg-yellow-900 px-2 py-1 rounded'>
+                    Pedidos
+                </Link>
             </nav>
         </div>
     );

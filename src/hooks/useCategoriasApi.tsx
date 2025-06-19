@@ -44,14 +44,12 @@ export function useCategoriasApi() {
     };
     const cambiarEstado = async (id: number) => {
         try {
-        const res = await fetch(`http://localhost:8080/categoria/switch-state`, {
-            method: 'POST',
+        const res = await fetch(`http://localhost:8080/categoria/switch-state/${id}`, {
+            method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(id)
         });
         if (!res.ok) throw new Error('Error al cambiar estado Categoria');
         const actualizada = await res.json(); //
-
         setCategorias(prev =>
             prev.map(cat => (cat.id === id ? actualizada : cat))
         );

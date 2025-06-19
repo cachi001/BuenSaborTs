@@ -2,12 +2,13 @@ import {Header} from '../components/Header'
 import {Boton} from '../components/Boton'
 import {CardLanding} from '../components/CardLanding'
 import {Footer} from '../components/Footer'
+import { scrollToSection } from '../components/Header'
 
 export const LandingPage = () => {
     return (
         <div className='w-full'>
             {/* SECCION PRINCIPAL */}
-            <section className='relative h-190 bg-fondo-principal bg-cover bg-center bg-no-repeat '>
+            <section id="home" className='relative h-190 bg-fondo-principal bg-cover bg-center bg-no-repeat '>
                 <div className='absolute inset-0 bg-black/30 z-0'>
                     <div className='h-full relative z-10 flex flex-col gap-40'>
                         <Header></Header>
@@ -50,7 +51,7 @@ export const LandingPage = () => {
                 </div>
             </section>
             {/* SECCION SOBRE NOSOTROS */}
-            <section className='h-480'>
+            <section id="nosotros" className='h-480'>
                 {/* PARTE SOBRE EL LOCAL */}
                 <div className='h-120 flex justify-center'>
                     <div className='h-full lg:w-220 md:w-180 sm:w-160 flex flex-col justify-center items-center gap-18'>
@@ -112,11 +113,15 @@ export const LandingPage = () => {
             {/* SECCION PARA VOLVER ARRIBA */}
             <section className='h-30 flex justify-center items-center bg-gray-200'>
                 <div>
-                    <Boton textoBoton={"IR ARRIBA"} estiloBoton={'text-black font-semibold border-1 border-black py-2 px-18 text-lg hover:bg-black hover:text-white transition-all duration-300 ease-in-out tracking-wider'}></Boton>
+                    <div  onClick={() => scrollToSection('home')}>
+                        <Boton textoBoton={"IR ARRIBA"} estiloBoton={'text-black font-semibold border-1 border-black py-2 px-18 text-lg hover:bg-black hover:text-white transition-all duration-300 ease-in-out tracking-wider'} />
+                    </div>
                 </div>
             </section>
             {/* SECCION INFERIOR FOOTER */}
-            <Footer></Footer>
+            <section id="contacto">
+                <Footer />
+            </section>
         </div>
     )
 }

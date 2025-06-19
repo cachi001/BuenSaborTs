@@ -1,6 +1,7 @@
 import { Categoria } from "./CategoriaClass";
 import { UnidadMedida } from "./UnidadMedidaClass";
 import { ArticuloManufacturadoDetalle } from "./ArticuloManufacturadoDetalleClass";
+import { ImagenArticulo } from "./ImagenArticulo";
 
 export class ArticuloManufacturado {
     id?: number;
@@ -12,6 +13,7 @@ export class ArticuloManufacturado {
     activo?: boolean;
     unidadMedida: UnidadMedida;
     categoria: Categoria;
+    imagenes?: ImagenArticulo[];
     articuloManufacturadoDetalles: ArticuloManufacturadoDetalle[] = [];
 
     constructor(
@@ -23,6 +25,7 @@ export class ArticuloManufacturado {
         unidadMedida: UnidadMedida,
         categoria: Categoria,
         articuloManufacturadoDetalles: ArticuloManufacturadoDetalle[] = [],
+        imagenes?: ImagenArticulo[],
         id?: number,
         activo?: boolean
     ) {
@@ -34,6 +37,7 @@ export class ArticuloManufacturado {
         this.preparacion = preparacion;
         this.unidadMedida = unidadMedida;
         this.categoria = categoria;
+        this.imagenes = imagenes;
         this.articuloManufacturadoDetalles = articuloManufacturadoDetalles;
         this.activo = activo;
     }

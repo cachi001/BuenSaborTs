@@ -1,15 +1,24 @@
 export class ImagenArticulo {
     id?: number;
-    activo?: boolean;
-    imagenUrl: string;
+    denominacion: string;
+    urlImagen: string;
+    tipo?: 'insumo' | 'manufacturado';
+    articuloId?: number;
+    file?: File; // ⬅️ Agregado para guardar el archivo real
 
     constructor(
-        imagenUrl: string,
-        activo?: boolean,
+        urlImagen: string,
+        denominacion: string,
+        tipo?: 'insumo' | 'manufacturado',
+        file?: File, // ⬅️ Nuevo parámetro
+        articuloId?: number,
         id?: number,
-    ){
-        this.imagenUrl = imagenUrl,
-        this.activo = activo,
-        this.id = id
+    ) {
+        this.urlImagen = urlImagen;
+        this.denominacion = denominacion;
+        this.tipo = tipo;
+        this.file = file;
+        this.articuloId = articuloId;
+        this.id = id;
     }
 }

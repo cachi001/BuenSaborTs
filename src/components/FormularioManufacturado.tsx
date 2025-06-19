@@ -1,15 +1,32 @@
 import { SelectorCategorias } from "./SelectorCategorias";
 import { SelectorUnidadMedida } from "./SelectorUnidadMedida";
+import { SelectorImagenes } from "./SelectorImagenes";
 import { DetallesInsumosForm } from "./DetalleInsumoForm";
 import {
   ArticuloManufacturadoDetalle,
   type ArticuloInsumoBase,
 } from "../classes/ArticuloManufacturadoDetalleClass";
+import type { CategoriaRequest } from "../pages/Categorias";
 import type { Categoria } from "../classes/CategoriaClass";
 import type { UnidadMedida } from "../classes/UnidadMedidaClass";
 import type { ArticuloManufacturado } from "../classes/ArticuloManufacturadoClass";
+import type { ImagenArticulo } from "../classes/ImagenArticulo";
+
+export interface ManufacturadoRequest {
+    denominacion: string;
+    precioVenta: number;
+    descripcion: string;
+    tiempoEstimado: number;
+    preparacion: string;
+    imagenes?: ImagenArticulo[]
+    unidadMedida: UnidadMedida
+    categoria: CategoriaRequest
+    articuloManufacturadoDetalles: ArticuloManufacturadoDetalle[];
+}
 
 interface Props {
+  imagenes: ImagenArticulo[];
+  setImagenes: (imagenes: ImagenArticulo[] ) => void;
   modoEdicion: boolean;
   setModoEdicion: (value: boolean) => void;
   denominacion: string;
@@ -56,6 +73,8 @@ export const FormularioManufacturado = ({
   detalles,
   setDetalles,
   insumos,
+  imagenes,
+  setImagenes,
   onSubmit,
   onCancel,
 }: Props) => {
@@ -75,15 +94,17 @@ export const FormularioManufacturado = ({
       unidadMedida,
       categoria,
       articuloManufacturadoDetalles: detalles,
+      imagenes
     };
     onSubmit(dto);
   };
 
   return (
     <form onSubmit={handleSubmit} className="bg-white p-6 rounded shadow-md space-y-6">
-      <div className="flex flex-col md:flex-row gap-6">
-        {/* Columna Izquierda */}
-        <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="flex md:flex-row gap-6">
+        
+        {/* Columna 1: Campos + Selectores */}
+        <div className="flex-1 space-y-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Denominación</label>
             <input
@@ -126,14 +147,13 @@ export const FormularioManufacturado = ({
               required
             />
           </div>
-          <div className="md:col-span-2">
+          <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Preparación</label>
             <textarea
               value={preparacion}
               onChange={(e) => setPreparacion(e.target.value)}
               className="resize-none border border-gray-300 rounded-lg p-2 w-full focus:ring-2 focus:ring-green-400 shadow-sm outline-none"
               required
-              
             />
           </div>
           <SelectorUnidadMedida
@@ -145,17 +165,30 @@ export const FormularioManufacturado = ({
           <SelectorCategorias
             categoriaSeleccionada={categoria}
             setCategoriaSeleccionada={setCategoria}
-            categoriasRaiz={categorias.filter(c => !c.categoriaPadre)}
+            categoriasRaiz={categorias.filter((c) => !c.categoriaPadre)}
             modoEdicion={modoEdicion}
           />
         </div>
 
-        <DetallesInsumosForm
-          detalles={detalles}
-          setDetalles={setDetalles}
-          insumos={insumos}
-        />
+        {/* Columna 2: Detalles Insumos */}
+        <div className="flex-1">
+          <DetallesInsumosForm
+            detalles={detalles}
+            setDetalles={setDetalles}
+            insumos={insumos}
+          />
+        </div>
+
+        {/* Columna 3: Selector de imágenes */}
+        <div className="flex-1">
+          <SelectorImagenes
+            imagenes={imagenes}
+            setImagenes={setImagenes}
+            tipoArticulo="manufacturado"
+          />
+        </div>
       </div>
+
       <div className="flex justify-end gap-2 pt-4">
         <button
           type="button"

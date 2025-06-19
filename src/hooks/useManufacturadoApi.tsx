@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { ArticuloManufacturado } from "../classes/ArticuloManufacturadoClass";
+import type { ManufacturadoRequest } from "../components/FormularioManufacturado";
 
 export function useManufacturadoApi() {
     const [manufacturados, setManufacturados] = useState<ArticuloManufacturado[]>([]);
@@ -7,51 +8,63 @@ export function useManufacturadoApi() {
     const fetchManufacturados = async () => {
         try {
             const res = await fetch("http://localhost:8080/articulo-manufacturado/all");
-            const data = await res.json();
-            const instancias = data.map((item: any) =>
-                new ArticuloManufacturado(
-                    item.id,
-                    item.denominacion,
-                    item.precioVenta,
-                    item.descripcion,
-                    item.tiempoEstimado,
-                    item.preparacion,
-                    item.unidadMedida,
-                    item.categoria,
-                    item.articuloManufacturadoDetalles
-                )
-            );
-            setManufacturados(instancias);
+            const data: ArticuloManufacturado[] = await res.json();
+            setManufacturados(data);
         } catch (error) {
             console.error("Error al obtener manufacturados:", error);
         }
     };
 
     const agregarManufacturado = async (nuevo: ArticuloManufacturado) => {
-        try {
-            const res = await fetch("http://localhost:8080/articulo-manufacturado/new", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(nuevo),
-            });
-            if (!res.ok) throw new Error("Error al agregar manufacturado");
-            const data = await res.json();
-            const nuevoManufacturado = new ArticuloManufacturado(
-                data.id,
-                data.denominacion,
-                data.precioVenta,
-                data.descripcion,
-                data.tiempoEstimado,
-                data.preparacion,
-                data.unidadMedida,
-                data.categoria,
-                data.articuloManufacturadoDetalles
-            );
-            setManufacturados((prev) => [...prev, nuevoManufacturado]);
-        } catch (error) {
-            console.error("Error al agregar manufacturado:", error);
-        }
+    console.log("CREANDO MANUFACTURADO: ", nuevo);
+
+    // Armo el DTO sin las imágenes reales (solo metadatos)
+    const manuDTO: ManufacturadoRequest = {
+        denominacion: nuevo.denominacion,
+        precioVenta: Number(nuevo.precioVenta),
+        descripcion: nuevo.descripcion,
+        preparacion: nuevo.preparacion,
+        tiempoEstimado: nuevo.tiempoEstimado,
+        articuloManufacturadoDetalles: nuevo.articuloManufacturadoDetalles,
+        unidadMedida: nuevo.unidadMedida,
+        categoria: {
+            denominacion: nuevo.categoria.denominacion,
+            categoriaPadreId: nuevo.categoria.categoriaPadre?.id || null
+        },
+        imagenes: nuevo.imagenes?.map((img) => ({
+            denominacion: img.denominacion,
+            urlImagen: ""
+        })) || []
+
     };
+
+    // Creo el FormData para enviar tanto los datos como los archivos
+    const formData = new FormData();
+    formData.append(
+        "datos",
+        new Blob([JSON.stringify(manuDTO)], { type: "application/json" })
+    );
+
+    // Agrego las imágenes reales al formData
+    nuevo.imagenes!.forEach((img) => {
+        if (img.file) {
+            formData.append("imagenes", img.file);
+        }
+    });
+
+    try {
+        const res = await fetch("http://localhost:8080/articulo-manufacturado/new", {
+            method: "POST",
+            body: formData,
+        });
+        if (!res.ok) throw new Error("Error al agregar manufacturado");
+
+        const data: ArticuloManufacturado = await res.json();
+        setManufacturados((prev) => [...prev, data]);
+    } catch (error) {
+        console.error("Error al agregar manufacturado:", error);
+    }
+};
 
     const actualizarManufacturado = async (id: number, actualizado: ArticuloManufacturado) => {
         try {
